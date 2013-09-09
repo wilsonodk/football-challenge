@@ -1,0 +1,87 @@
+#messenger {
+	background-color: #ddd;
+	border: 1px solid #999;
+	height: 553px;
+	position: absolute;
+	right: 20px;
+	top: 95px;
+	width: 300px;
+	overflow: none;
+}
+#messenger-input {
+	background-color: #ccc;
+	border: 1px solid #999;
+	font-size: 12px;
+	color: #000;
+	position: absolute;
+	bottom: -1px;
+	right: -6px;
+	width: 296px;
+	padding: 3px 2px;
+	margin: 0 5px;
+}
+#all-messages {
+	width: 300px;
+	height: 487px;
+	overflow: auto;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+#messenger .message {
+	background-color: #fff;
+	border: 1px solid #999;
+	margin: 5px;
+	padding: 3px 5px;
+	font-size: 12px;
+	color: #000;
+}
+#messenger .message a,
+#messenger .message a:link, 
+#messenger .message a:visited {
+	color: #333;
+}
+#messenger .message a:hover,
+#messenger .message a:active {
+
+}
+
+#messenger .message .tools {
+	font-size: 11px;
+	color: #777;
+}
+
+#messenger .message .tools span {
+	display: none;
+}
+
+#messenger .message .tools a,
+#messenger .message .tools a:link,
+#messenger .message .tools a:visited {
+	color: #777;
+	font-weight: normal;
+	text-decoration: underline;
+}
+#messenger .message .tools a:hover {
+	text-decoration: none;
+}
+#messenger .message .tools a:active {
+	color: #900;
+	text-decoration: none;
+}
+
+#messenger .input-area {
+	display: none;
+}
+#messenger-input textarea,
+#messenger .input-area textarea {
+	width: 95%;
+	margin: 5px 3px;
+}
+
+#messenger .form-error,
+#messenger-input .form-error{
+	background-color: #f8dbdb;  
+	border-color: #e77776;  
+}

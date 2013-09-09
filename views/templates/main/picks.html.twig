@@ -1,0 +1,22 @@
+{% extends "base.html.twig" %}
+
+{% block head %}
+	{{ parent() }}
+{% endblock %}
+
+{% block content %}
+	{{ parent() }}
+	
+	<h2>{{ title }}</h2>
+
+	<div class="picks">	
+		{% for challenge in challenges %}
+			<h3>Week {{ challenge[0].week }}</h3>
+			{{ macros.picks_table(challenge, user_subs[challenge[0].week], base_path) }}
+		{% endfor %}
+	</div>
+	
+	<div style="clear: both;"></div>
+	
+	{# macros.get_options(all_ops) #}
+{% endblock %}

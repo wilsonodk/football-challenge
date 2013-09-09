@@ -1,0 +1,76 @@
+{% import "macros.twig" as macros %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>{{ site_name }} &ndash; {{ page_name }}</title>
+	<link rel="shortcut icon" href="http://wilson.odk.com/junkies/favicon.ico" />
+	<link rel="stylesheet" type="text/css" href="{{ base_path }}/public/junkies.css" />
+	<script type="text/javascript" src="{{ base_path }}/public/jquery-1.6.2.min.js"></script>
+	<script type="text/javascript" src="{{ base_path }}/public/junkies.js"></script>
+	{% block head %}
+	{% endblock %}
+</head>
+<body>
+<div id="wings"><img src="{{ base_path }}/public/full_junkies_wings.jpg" width="1800" height="1200" /></div>
+<div id="wrapper">
+	<!-- Header -->
+	<div id="header">
+		<h1>{{ macros.ahref('/', site_name, base_path) }}</h1>
+		<ul>
+			<li id="home">{{ macros.ahref('/', 'Home', base_path) }}</li>
+			{% for week in challenge_weeks %}
+				<li id="week-{{ week.num }}">{{ macros.ahref(week.path, week.name, base_path) }}</li>
+			{% endfor %}
+		</ul>
+		<div class="account-area">
+			{% if user_info.uid %}
+				<p>
+					{{ macros.ahref('/my-account', user_info.name, base_path) }} |
+					{% if user_info.perms == 2 %}{{ macros.ahref('/commissioner', 'Commissioner', base_path) }} | {% endif %}
+					{{ macros.ahref('/logout', 'Logout', base_path) }}
+				</p>
+			{% else %}
+				<p>{{ macros.ahref('/login', 'Login', base_path) }}</p>
+			{% endif %}
+		</div>
+	</div>
+
+	<!-- Site Message Here -->
+	{% block site_message %}
+		{% if have_flash_errors %}
+			<div id="message" class="error">
+				{% for message in flash_errors %}
+					<p>{{ message }}</p>
+				{% endfor %}
+			</div>
+		{% endif %}
+		{% if have_flash_messages %}
+			<div id="message" class="normal">
+				{% for message in flash_messages %}
+					<p>{{ message }}</p>
+				{% endfor %}
+			</div>
+		{% endif %}
+	{% endblock %}
+
+	<!-- Content -->
+	<div id="content">
+	{% block content %}
+		<h2>{{ page_name }}</h2>
+	{% endblock %}
+	</div>
+
+	<!-- Footer -->
+	<div id="footer">
+		<div>
+			<p>Weekly Results &rarr; 
+			{% for user in footer %}
+				{{ macros.ahref(user.path, user.name, base_path)|raw }}{% if not loop.last %} | {% endif %}
+			{% endfor %}</p>
+			<p>Junkies Football Challenge &copy;2011&ndash;2012 Wilson Wise. All rights reserved.</p>
+		</div>
+	</div>
+</div>
+</body>
+</html>

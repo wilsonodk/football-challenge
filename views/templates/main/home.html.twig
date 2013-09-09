@@ -1,0 +1,45 @@
+{% extends "base.html.twig" %}
+
+{% use "messenger.html.twig" %}
+
+{% block head %}
+	{{ parent() }}
+{% endblock %}
+
+{% block content %}
+	{{ parent() }}
+	<h3>After Week {{ standings_week }}</h3>
+	
+	{# Standings Table #}
+	{{ macros.table('standings-table') }}
+		<tr>
+			<th>&nbsp;</th>
+			<th align="left">Name</th>
+			<th>Correct</th>
+			<th>Wrong</th>
+			<th>Percentage</th>
+		</tr>
+	{% for item in standings %}
+		<tr>
+			<td align="right">{{ item.place }}</td>
+			<td>
+				<strong>
+					{% if item.ready %}
+						{{ macros.ahref(item.path, item.name, base_path) }}
+					{% else %}
+						{{ item.name }}
+					{% endif %}
+				</strong>
+			</td>
+			<td align=center>{{ item.wins }}</td>
+			<td align=center>{{ item.loses }}</td>
+			<td align=center>{{ item.per }}%</td>
+		</tr>
+	{% endfor %}
+	</table>
+	
+	{% block messenger %}
+		{{ parent() }}
+	{% endblock %}
+	<div class="clear: both;"></div>
+{% endblock %}

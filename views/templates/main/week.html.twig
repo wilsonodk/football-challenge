@@ -1,0 +1,54 @@
+{% extends "base.html.twig" %}
+
+{% use "messenger.html.twig" %}
+
+{% block head %}
+	{{ parent() }}
+	<script type="application/javascript">
+	var useTab = {{ week_num }};
+	{% if challenge_active %}
+	$(document).ready(loadWeeklyChallenge);
+	{% endif %}
+	</script>
+{% endblock %}
+
+{% block content %}
+	{{ parent() }}
+	
+	{# Challenge form open #}
+	{% if challenge_active and show_form %}
+		<form method="post" action="{{ base_path }}/week/{{ week_num }}">
+	{% endif %}
+	
+		{# Challenge table #}
+		{{ macros.challenge_table(challenge_info, user_challenge_info, base_path, show_form) }}
+		
+		{# Win-Loss Count #}
+		{% if not challenge_active and user_active %}
+			{{ macros.win_loss_count(challenge_info, user_challenge_info, base_path) }}
+		{% endif %}
+	
+	{# Challenge form close #}
+	{% if challenge_active %}
+			<p>This challenge closes on {{ challenge_info[0].closetime_formatted }}.
+			<br /><span id="end-time" class="time"></span></p>
+		{% if show_form %}
+			<p id="form-action">
+				<input type="submit" value="Save"> or {{ macros.ahref("/", "Cancel", base_path) }}
+			</p>	
+		</form>
+		{% endif %}
+	{% else %}
+		<p>This challenge closed on {{ challenge_info[0].closetime_formatted }}.
+	{% endif %}
+	
+	{#
+	{% if challenge_active %}
+		{{ macros.get_options(all_ops) }}
+	{% endif %}
+	#}
+	
+	{% block messenger %}
+		{{ parent() }}
+	{% endblock %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "admin/admin.html.twig" %}
+
+{% block content %}
+	{{ parent() }}
+
+	<h2 style="margin-bottom: 5px;">Log Output</h2>
+	<div id="log">
+	{% for line in log_data %}{{ line|log_style|raw }}{% endfor %}
+	</div>
+	<p>{{ macros.ahref("", "Commissioner Homepage", base_admin) }}</p>
+{% endblock %}
