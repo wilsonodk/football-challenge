@@ -10,7 +10,7 @@
 	{{ parent() }}
 	<h2>{{ page_name }}</h2>
 	<h3>After Week {{ standings_week }}</h3>
-	
+
 	{# Standings Table #}
 	{{ macros.table('standings-table') }}
 		<tr>
@@ -26,10 +26,12 @@
 			<td>
 				{% if item.ready %}
 					{% set src %}{{ base_uri }}/public/fc-win-mark.png{% endset %}
+                    {% set img_title %}Picks submitted{% endset %}
 				{% else %}
 					{% set src %}{{ base_uri }}/public/fc-lose-mark.png{% endset %}
+                    {% set img_title %}Picks pending{% endset %}
 				{% endif %}
-				{{ macros.img(src, 10, 10, "submission") }}
+				{{ macros.img(src, 10, 10, img_title) }}
 				<strong>{{ macros.link(item.path, item.name, base_path) }}</strong>
 			</td>
 			<td align=center>{{ item.wins }}</td>
@@ -38,7 +40,7 @@
 		</tr>
 	{% endfor %}
 	</table>
-	
+
 	{% block messenger %}
 		{{ parent() }}
 	{% endblock %}
