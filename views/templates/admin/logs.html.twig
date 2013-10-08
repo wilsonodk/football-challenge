@@ -3,9 +3,9 @@
 {% block content %}
 	{{ parent() }}
 
-	<h2 style="margin-bottom: 5px;">Log Output</h2>
+	<h3 style="margin-bottom: 5px;">Log Output</h3>
 	<div id="log">
 	{% for line in log_data %}{{ line|log_style|raw }}{% endfor %}
 	</div>
-	<p>{{ macros.ahref("", "Commissioner Homepage", base_admin) }}</p>
+	<p>{{ macros.link("", "Commissioner Homepage", base_admin) }}</p>
 {% endblock %}

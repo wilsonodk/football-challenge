@@ -526,6 +526,10 @@ function env($reset = null)
           $GLOBALS[$varname][$k] = $v;
         }
       }
+      elseif ($_SERVER['CONTENT_TYPE'] == 'application/json')
+      {
+      	$GLOBALS['_JSON'] = json_decode(file_get_contents('php://input'));
+      }
       else
       {
         parse_str(file_get_contents('php://input'), $GLOBALS[$varname]);

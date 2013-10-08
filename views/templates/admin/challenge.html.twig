@@ -1,0 +1,108 @@
+{% extends "admin/admin.html.twig" %}
+
+{% block head %}
+	{{ parent() }}
+	<style type="text/css">
+	.challenge-table {
+		width: 550px;
+	}
+	</style>
+{% endblock %}
+
+{% block content %}
+	{{ parent() }}
+	
+	{% set form_url %}
+		{{ base_admin }}/challenge 
+	{% endset %}
+	
+	{# Page title #}
+	{% if task_type == 'create' %}
+		{% set button_value = 'Create challenge' %}
+		<h3>Creating Challenge for Week {{ current_week }}</h3>
+	{% elseif task_type == 'edit' %}
+		{% set button_value = 'Update challenge' %}
+		{% set form_url %}
+			{{ form_url|trim }}/edit
+		{% endset %}
+		<h3>Editting Challenge for Week {{ challenge_week }}</h3>
+	{% endif %}
+	
+	<form method="post" action="{{ form_url|trim }}">
+		{{ macros.table('challenge-table') }}
+			<tr>
+				<th>&nbsp;</th>
+				<th>Away Team @ Home Team</th>
+			</tr>
+			{% for i in 1..num_challenges %}
+				<tr class="{{ cycle(['odd', 'even'], loop.index) }}">
+					<td>{{ loop.index }}</td>
+					<td>{% if task_type == 'create' %}
+						{{ _self.challenge_picker(scoreboard) }}
+					{% elseif task_type == 'edit' %}
+						{{ _self.challenge_picker(scoreboard, challenges[i - 1].cid, challenges[i - 1].gid) }}
+					{% endif %}</td>
+				</tr>
+			{% endfor %}
+		</table>
+		{% if task_type == 'edit' %}
+			<input type="hidden" name="_method" value="put" />
+		{% endif %}
+		<input type="hidden" name="current-week" value="{{ current_week }}" />
+		<p><input type="submit" value="{{ button_value }}" /> or <a href="..">Cancel</a></p>
+	</form>
+	
+	{% if task_type == 'edit' %}
+		<div class="delete">
+			<form method="post" action="{{ form_url|trim }}">
+				<input type="hidden" name="_method" value="delete" />
+				<p>Careful, you cannot undo this action!</p>
+				<p><input type="submit" value="Delete challenge" /></p>
+			</form>
+		</div>
+	{% endif %}
+	
+{% endblock %}
+
+{% block footer %}
+	{{ parent() }}
+	<script type="application/javascript">
+	$('.schoolPicker').chosen();
+	</script>
+{% endblock %}
+
+{% macro challenge_picker(scoreboard, cid, gid) %}
+	<select data-placeholder="Choose Game"  class="schoolPicker" name="challenge[]" style="width: 500px;">
+		<option></option>
+		{% for days in scoreboard %}
+			{% set game_day = days.day|get_day %}
+			<optgroup label="{{ days.day }}">
+				{% for game in days.games %}
+					{% set away_name %}
+						{% if game.away.nameRaw %}
+							{{ game.away.nameRaw }}
+						{% else %}
+							{{ game.away.name_raw }}
+						{% endif %}
+					{% endset %}
+					{% set home_name %}
+						{% if game.home.nameRaw %}
+							{{ game.home.nameRaw }}
+						{% else %}
+							{{ game.home.name_raw }}
+						{% endif %}
+					{% endset %}
+					{% set value %}
+						{{ game.id }}|{{ away_name|trim|raw }}|{{ home_name|trim|raw }}|{{ game.startDate }} {{ game.startTime }}{% if cid %}|{{ cid }}{% endif %}
+					{% endset %}
+					{% set selected %}
+						{% if gid == game.id %}
+							selected="selected"
+						{% endif %}
+					{% endset %}
+					<option value="{{ value|trim|raw }}" {{ selected|trim }}>{{ away_name|trim|raw }} @ {{ home_name|trim|raw }} ({{ game_day }} {{ game.startTime }})</option>
+				{% endfor %}
+			</optgroup>
+		{% endfor %}
+	</select>
+{% endmacro %}

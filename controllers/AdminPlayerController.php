@@ -4,16 +4,17 @@ class AdminPlayerController extends AdminController
 {
 	static function player() {
 		if (self::checkPerms()) {
-			$db = option('db_con');
+			$db = option('db');
 			$players = array();
 			$query = 'SELECT uid, username AS name FROM {{users}} ORDER BY username';
-			if ($result = $db->query($query)) {
+			if ($result = $db->qry($query)) {
 				while ($obj = $result->fetch_object()) {
 					$players[] = $obj;
 				}
 			}
 			
 			return self::template('admin/player-list.html.twig', array(
+				'page_name' => 'Player Administration',
 				'players' => $players,
 			));
 		}
@@ -25,6 +26,7 @@ class AdminPlayerController extends AdminController
 	static function player_show($id) {
 		if (self::checkPerms()) {
 			return self::template('admin/player.html.twig', array(
+				'page_name' => 'Player Administration',
 				'activity' => 'View',
 				'player' => self::getUserInfoFromUid($id),
 			));
@@ -37,6 +39,7 @@ class AdminPlayerController extends AdminController
 	static function player_add() {
 		if (self::checkPerms()) {
 			return self::template('admin/player.html.twig', array(
+				'page_name' => 'Player Administration',
 				'activity' => 'Create',
 			));
 		}
@@ -47,12 +50,12 @@ class AdminPlayerController extends AdminController
 	
 	static function player_do_add() {
 		if (self::checkPerms()) {
-			$db = option('db_con');
+			$db = option('db');
 			$log = option('log');
 			// uid, username, email, password, wins, loses, permissions
-			$query = 'INSERT INTO {{users}} VALUES (NULL, "%s", "%s", "%s", 0, 0, %s)';
+			$query = 'INSERT INTO {{users}} VALUES (NULL, "%s", "%s", "%s", 0, 0, %s, 0)';
 			
-			if ($db->query(
+			if ($db->qry(
 					$query, 
 					$db->escape_string(strtoupper(get_post('username'))), 
 					$db->escape_string(strtolower(get_post('email'))), 
@@ -82,6 +85,7 @@ class AdminPlayerController extends AdminController
 	static function player_show_edit($id) {
 		if (self::checkPerms()) {
 			return self::template('admin/player.html.twig', array(
+				'page_name' => 'Player Administration',
 				'activity' => 'Edit',
 				'player' => self::getUserInfoFromUid($id),
 			));
@@ -93,7 +97,7 @@ class AdminPlayerController extends AdminController
 	
 	static function player_do_edit($id) {
 		if (self::checkPerms()) {
-			$db = option('db_con');
+			$db = option('db');
 			$log = option('log');
 			// uid, username, email, password, wins, loses, permissions
 			$db->setQuery(
@@ -123,6 +127,7 @@ class AdminPlayerController extends AdminController
 	static function player_show_delete($id) {
 		if (self::checkPerms()) {
 			return self::template('admin/player.html.twig', array(
+				'page_name' => 'Player Administration',
 				'activity' => 'Delete',
 				'player' => self::getUserInfoFromUid($id),
 			));
@@ -134,10 +139,10 @@ class AdminPlayerController extends AdminController
 	
 	static function player_do_delete($id) {
 		if (self::checkPerms()) {
-			$db = option('db_con');
+			$db = option('db');
 			$log = option('log');
 			$query = 'DELETE FROM {{users}} WHERE uid = %s';
-			if ($db->query($query, $id)) {
+			if ($db->qry($query, $id)) {
 				flash('message:deleted player', 'Successfully deleted the player.');
 			}
 			else {

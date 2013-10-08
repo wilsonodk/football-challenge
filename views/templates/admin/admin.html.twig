@@ -2,6 +2,13 @@
 
 {% block head %}
 	{{ parent() }}
+	<link rel="stylesheet" type="text/css" href="{{ base_path }}/public/chosen.css" />
+	<script type="application/javascript" src="{{ base_path}}/public/chosen.min.js"></script>
 {% endblock %}
 
 {% set base_admin %}{{ base_path|trim }}/commissioner{% endset %}
+
+{% block content %}
+	{{ parent() }}
+	<h2>Commissioner Tasks</h2>
+{% endblock %}

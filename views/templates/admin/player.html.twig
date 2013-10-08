@@ -37,9 +37,9 @@
 	<p>&nbsp;</p>
 	
 	{% if method == 'VIEW' %}
-		<p>{{ macros.ahref('/edit', 'Edit', player.uid) }} | {{ macros.ahref('/delete', 'Delete', player.uid) }}</p>
+		<p>{{ macros.link('/edit', 'Edit', player.uid) }} | {{ macros.link('/delete', 'Delete', player.uid) }}</p>
 	{% else %}
-			<p><input type="submit" value="{{ activity }} Player" /> or {{ macros.ahref("/player", "Cancel", base_admin)|trim|raw }}.</p>
+			<p><input type="submit" value="{{ activity }} Player" /> or {{ macros.link("/player", "Cancel", base_admin)|trim|raw }}.</p>
 		</form>
 	{% endif %}
 {% endblock %}

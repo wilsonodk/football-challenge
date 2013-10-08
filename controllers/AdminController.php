@@ -1,8 +1,6 @@
 <?php
 
-require_once('FootballChallengeController.php');
-
-class AdminController extends FootballChallengeController
+class AdminController extends AppController
 {
 	static function checkPerms() {
 		$active_user = option('user_info');
@@ -12,13 +10,13 @@ class AdminController extends FootballChallengeController
 
 	static function home() {
 		if (self::checkPerms()) {
-			$db = option('db_con');
+			$db = option('db');
 			$log = option('log');
 			$week = option('challenge_week');
 			
 			$state = 0;
-			$query = 'SELECT COUNT(*) as count FROM junkies_challenges WHERE wsid <> 0 AND week = %d AND year = %d';
-			if ($result = $db->query($query, $week, FC_YEAR)) {
+			$query = 'SELECT COUNT(*) as count FROM {{challenges}} WHERE winner_sid <> 0 AND week = %d AND year = %d';
+			if ($result = $db->qry($query, $week, FC_YEAR)) {
 				while ($obj = $result->fetch_object()) {
 					if ($week === 0 || $obj->count === '10') {
 						$state = 'create';	
@@ -33,6 +31,7 @@ class AdminController extends FootballChallengeController
 			}
 		
 			return self::template('admin/home.html.twig', array(
+				'page_name' => 'Commissioner',
 				'challenge_state' => $state,
 			));
 		}
@@ -45,6 +44,7 @@ class AdminController extends FootballChallengeController
 		if (self::checkPerms()) {
 			$log = option('log');
 			return self::template('admin/logs.html.twig', array(
+				'page_name' => 'Log',
 				'log_data' => $log->read(TRUE, TRUE),
 			));
 		}
@@ -54,12 +54,12 @@ class AdminController extends FootballChallengeController
 	}
 	
 	static function standings() {
-		$db = option('db_con');
+		$db = option('db');
 		$log = option('log');
 		
 		$users = array();
 		$winners = array();
-		if ($result = $db->query('SELECT uid, username FROM {{users}}')) {
+		if ($result = $db->qry('SELECT uid, username FROM {{users}}')) {
 			while ($obj = $result->fetch_object()) {
 				$users[$obj->username] = array('wins' => 0, 'losses' => 0, 'total' => 0, 'uid' => $obj->uid);
 			}
@@ -68,13 +68,13 @@ class AdminController extends FootballChallengeController
 			for ($week = 1; $week <= $num_weeks; $week++) {
 				$db->setQuery(
 					'winners',
-					'SELECT cid, wsid FROM {{challenges}} WHERE year = %s AND week = %s',
+					'SELECT cid, winner_sid FROM {{challenges}} WHERE year = %s AND week = %s',
 					FC_YEAR,
 					$week
 				);
 				if ($winners_result = $db->useQuery('winners')) {
 					while ($obj = $winners_result->fetch_object()) {
-						$winners[$obj->cid] = array('cid' => $obj->cid, 'sid' => $obj->wsid);
+						$winners[$obj->cid] = array('cid' => $obj->cid, 'sid' => $obj->winner_sid);
 					}
 					
 					foreach ($users as $user => $results) {

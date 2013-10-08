@@ -1,21 +1,22 @@
 <?php
 
-class UserController extends FootballChallengeController
+class UserController extends AppController
 {
 	static function show_login() {
 		return self::template('user/login.html.twig', array(
+			'page_name' => 'Login',
 			'referrer' => self::getReferrer(),
 		));	
 	}
 	
 	static function do_login() {
-		$db = option('db_con');
+		$db = option('db');
 		$log = option('log');
 		$referrer = get_post('referrer');
 		$username = $db->escape_string(get_post('username'));
 		$password = $db->escape_string(get_post('password'));
 		
-		if ($result = $db->query('SELECT uid, username, permissions FROM {{users}} WHERE username = "%s" AND password = "%s"', $username, $password)) {
+		if ($result = $db->qry('SELECT uid, username, permissions FROM {{users}} WHERE username = "%s" AND password = "%s"', $username, $password)) {
 			if ($result->num_rows === 1) {
 				while ($obj = $result->fetch_object()) {
 					// Set our cookie...
@@ -52,12 +53,12 @@ class UserController extends FootballChallengeController
 	}
 	
 	static function show_account() {
-		$db = option('db_con');
+		$db = option('db');
 		$log = option('log');
 		
 		$user = option('user_info');
 		if ($user['uid'] && $user['name'] && $user['perms']) {
-			if ($result = $db->query('SELECT email FROM {{users}} WHERE uid = %s AND username = "%s" AND permissions = %s', $db->escape_string($user['uid']), $db->escape_string($user['name']), $db->escape_string($user['perms']))) {
+			if ($result = $db->qry('SELECT email FROM {{users}} WHERE uid = %s AND username = "%s" AND permissions = %s', $db->escape_string($user['uid']), $db->escape_string($user['name']), $db->escape_string($user['perms']))) {
 				if ($result->num_rows === 1) {
 					while ($obj = $result->fetch_object()) {
 						$user['email'] = $obj->email;
@@ -71,6 +72,7 @@ class UserController extends FootballChallengeController
 			}
 	
 			return self::template('user/account.html.twig', array(
+				'page_name' => 'My Account',
 				'referrer'	=> self::getReferrer(),
 				'uid'		=> $user['uid'],
 				'username'	=> $user['name'],
@@ -86,7 +88,7 @@ class UserController extends FootballChallengeController
 	}
 	
 	static function edit_account() {
-		$db = option('db_con');
+		$db = option('db');
 		$log = option('log');
 		$uid = get_post('uid');
 		$username = get_post('username');

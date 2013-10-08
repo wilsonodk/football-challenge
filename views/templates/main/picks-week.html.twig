@@ -1,0 +1,32 @@
+{% extends "base.html.twig" %}
+
+{% block head %}
+	{{ parent() }}
+	<script type="application/javascript">
+		var useTab = {{ week_num }};
+	</script>
+{% endblock %}
+
+{% block content %}
+	{{ parent() }}
+	
+	{% set week_url %}
+		/week/{{ week_num }}
+	{% endset %}
+	<h2>{{ macros.link(week_url|trim, title, base_path) }}</h2>
+
+	<div class="picks">	
+		{% for submission in submissions  %}
+			{% set link_url %}
+				/picks/{{ submission.user|lower|raw }}
+			{% endset %}
+			{% set link_text %}
+				{{ submission.user|upper }}&apos;s Picks
+			{% endset %}
+			<h3>{{ macros.link(link_url|trim, link_text, base_path) }}</h3>
+			{{ macros.picks_table(challenge, submission, base_path) }}
+		{% endfor %}
+	</div>
+	
+	<div style="clear: both;"></div>
+{% endblock %}

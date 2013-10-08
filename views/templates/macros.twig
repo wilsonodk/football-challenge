@@ -1,3 +1,18 @@
+{# Application Macros #}
+
+{% macro link(href, text, root) %}
+	{% set url %}
+		{{ root|default('') }}{{ href }}
+	{% endset %}
+	<a href="{{ url|one_space|raw }}">{{ text }}</a>
+{% endmacro %}
+
+{% macro img(src, width, height, alt) %}
+	<img src="{{ src|one_space }}" width="{{ width }}" height="{{ height }}" border="0" alt="{{ alt }}" />
+{% endmacro %}
+
+{# Additional Macros #}
+
 {% macro get_options(all_ops) %}
 	<ul>
 	{% for op in all_ops %}
@@ -11,17 +26,6 @@
 		</li>
 	{% endfor %}
 	</ul>
-{% endmacro %}
-
-{% macro img(src, width, height, alt) %}
-	<img src="{{ src|one_space }}" width="{{ width }}" height="{{ height }}" border="0" alt="{{ alt }}" />
-{% endmacro %}
-
-{% macro ahref(href, text, root) %}
-	{% set url %}
-		{{ root|default('') }}{{ href }}
-	{% endset %}
-	<a href="{{ url|one_space|raw }}">{{ text }}</a>
 {% endmacro %}
 
 {% macro icon_win(base) %}
@@ -166,6 +170,9 @@
 {% endmacro %}
 
 {% macro picks_table(challenges, submission, base_path) %}
+	{% set wins_count = 0 %}
+	{% set lose_count = 0 %}
+	{% set wait_count = 0 %}
 	{{ _self.table('week-table') }}
 		<tr>
 			<th width="50%" colspan="2">Away</th>
@@ -204,6 +211,27 @@
 					{% endif %}
 				{% endfor %}
 			{% endset %}
+			{% if challenge.winner_sid > 0 %}
+				{% for pick in submission.challenges %}
+					{% if pick.cid == challenge.cid %}
+						{% if pick.sid == challenge.away_sid %}
+							{% if pick.sid == challenge.winner_sid %}
+								{% set wins_count = wins_count + 1 %}
+							{% else %}
+								{% set lose_count = lose_count + 1 %}
+							{% endif %}
+						{% elseif pick.sid == challenge.home_sid %}
+							{% if pick.sid == challenge.winner_sid %}
+								{% set wins_count = wins_count + 1 %}
+							{% else %}
+								{% set lose_count = lose_count + 1 %}
+							{% endif %}							
+						{% endif %}
+					{% endif %}
+				{% endfor %}
+			{% else %}
+				{% set wait_count = wait_count + 1 %}
+			{% endif %}
 			<tr>
 				<td width="25%" class="{{ away_class|one_space }}">{{ _self.get_icon(challenge.away_sid, challenge.winner_sid, base_path) }} {{ challenge.away_school }}</td>
 				<td width="25%" class="conference {{ away_class|one_space }}">{{ challenge.away_conf }}</td>
@@ -212,4 +240,7 @@
 			</tr>
 		{% endfor %}
 	</table>
+	<p>
+		<span class="pick-results won">{{ _self.icon_win(base_path) }} Wins: {{ wins_count }}</span><span class="pick-results result lost">{{ _self.icon_loss(base_path) }} Losses: {{ lose_count }}</span>{% if wait_count > 0 %}<span class="pick-results result waiting">{{ _self.icon_loss(base_path) }} Pending: {{ wait_count }}</span>{% endif %}
+	</p>
 {% endmacro %}

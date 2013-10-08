@@ -1,5 +1,13 @@
 <?php
-class MyDB extends mysqli {
+/*
+ * This file is part of Wodk.
+ *
+ * (c) 2012 Wilson Wise
+ *
+ * Extends MySQLi.
+ *
+ */
+class Wodk_DB extends mysqli {
 	private $_prefix = '';
 	private $prefix_pattern = '/{{(\w+)}}/';
 	private $use_prefix = FALSE;
@@ -17,17 +25,25 @@ class MyDB extends mysqli {
 	}
 	
 	/**
-	 * query
+	 * qry
 	 * This will execute a SQL statement, but is extended to take arguments ala printf
 	 * @param The first argument is the SQL statement.
 	 * @params The following arguments are items to be formatted into the SQL statement.
 	 * @return The query with all argments formatted.
 	 */
-	public function query() {
+	public function qry() {
 		$args = func_get_args();
 		$query = $this->prepareQuery($args);
 		return parent::query($query);
 	}
+	
+	/**
+	 * getInsertId
+	 * @return Returns the insert id from the last INSERT query
+	 */
+	public function getInsertId() {
+        return $this->insert_id;
+    }
 	
 	/**
 	 * setPrefix
@@ -53,14 +69,6 @@ class MyDB extends mysqli {
 		$this->prefix_pattern = $pattern;
 		return $this;
 	}
-	
-	/**
-	 * getInsertId
-	 * @return Returns the insert id from the last INSERT query
-	 */
-	public function getInsertId() {
-        return $this->insert_id;
-    }
     
     /**
      * setQuery

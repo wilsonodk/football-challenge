@@ -1,4 +1,7 @@
+.DS_Store
 db-prod.php
 db-dev.php
 nogit
 *.log
+*.tar.gz
+BUILD_VERSION.txt

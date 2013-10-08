@@ -5,5 +5,5 @@
 
 	<h2 style="margin-bottom: 5px;">Check Games for Week {{ challenge_week }}</h2>
 	{% for line in content %}<p>{{ line|raw }}</p>{% endfor %}
-	<p>{{ macros.ahref("", "Commissioner Homepage", base_admin) }}</p>
+	<p>{{ macros.link("", "Commissioner Homepage", base_admin) }}</p>
 {% endblock %}

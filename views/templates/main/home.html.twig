@@ -8,6 +8,7 @@
 
 {% block content %}
 	{{ parent() }}
+	<h2>{{ page_name }}</h2>
 	<h3>After Week {{ standings_week }}</h3>
 	
 	{# Standings Table #}
@@ -23,13 +24,13 @@
 		<tr>
 			<td align="right">{{ item.place }}</td>
 			<td>
-				<strong>
-					{% if item.ready %}
-						{{ macros.ahref(item.path, item.name, base_path) }}
-					{% else %}
-						{{ item.name }}
-					{% endif %}
-				</strong>
+				{% if item.ready %}
+					{% set src %}{{ base_uri }}/public/fc-win-mark.png{% endset %}
+				{% else %}
+					{% set src %}{{ base_uri }}/public/fc-lose-mark.png{% endset %}
+				{% endif %}
+				{{ macros.img(src, 10, 10, "submission") }}
+				<strong>{{ macros.link(item.path, item.name, base_path) }}</strong>
 			</td>
 			<td align=center>{{ item.wins }}</td>
 			<td align=center>{{ item.loses }}</td>

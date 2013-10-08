@@ -28,7 +28,9 @@
 	top: 0;
 	left: 0;
 }
+#messenger textarea {
 
+}
 #messenger .message {
 	background-color: #fff;
 	border: 1px solid #999;
@@ -47,7 +49,8 @@
 
 }
 
-#messenger .message .tools {
+#messenger .message .tools,
+#messenger .message .edit-area {
 	font-size: 11px;
 	color: #777;
 }
@@ -58,26 +61,38 @@
 
 #messenger .message .tools a,
 #messenger .message .tools a:link,
-#messenger .message .tools a:visited {
+#messenger .message .tools a:visited,
+#messenger .message .edit-area a,
+#messenger .message .edit-area a:link,
+#messenger .message .edit-area a:visited{
 	color: #777;
 	font-weight: normal;
 	text-decoration: underline;
 }
-#messenger .message .tools a:hover {
+#messenger .message .tools a:hover,
+#messenger .message .edit-area a:hover{
 	text-decoration: none;
 }
-#messenger .message .tools a:active {
+#messenger .message .tools a:active,
+#messenger .message .edit-area a:active{
 	color: #900;
 	text-decoration: none;
 }
 
-#messenger .input-area {
+#messenger .input-area,
+#messenger .edit-area {
 	display: none;
 }
 #messenger-input textarea,
-#messenger .input-area textarea {
+#messenger .input-area textarea,
+#messenger .edit-area textarea {
 	width: 95%;
 	margin: 5px 3px;
+}
+#messenger .edit-area textarea {
+	padding: 5px;
+	line-height: 1.3em;
+	background-color: #ffe;
 }
 
 #messenger .form-error,

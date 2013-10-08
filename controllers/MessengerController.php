@@ -1,38 +1,24 @@
 <?php
-class MessengerController extends FootballChallengeController
+class MessengerController extends AppController
 {
 	static function show() {
-		$db = option('db_con');
-		$log = option('log');
-		$output = new StdClass;
-		$output->messages = array();
-		$query = 'SELECT m.mid AS mid, m.pid AS pid, m.message AS message, m.posted AS posted, u.username AS username, m.uid AS uid FROM junkies_messages m LEFT JOIN junkies_users u ON m.uid = u.uid WHERE m.active = 1 ORDER BY m.pid, m.posted DESC';
-		
-		if ($results = $db->query($query)) {
-			while ($obj = $results->fetch_object()) {
-				$output->messages[] = $obj;
-			}
-		}
-		else {
-			$log->log('error', 'Could not get messeges.', $db->error);	
-		}
-		
-		return json_encode($output);
+		return self::getMessages();
 	}
 	
 	static function create() {
-		$db = option('db_con');
+		$db = option('db');
 		$log = option('log');
-		$output = new StdClass;
 		// mid, pid, uid, message (blob), posted, active, week (challenge week)
 		$query = 'INSERT INTO {{messages}} VALUES (NULL, %d, %s, "%s", %s, %s, %s)';
 		$user_info = option('user_info');
 		
+		$pid = get_post('pid');
+		$msg = get_post('message');
+		
 		if ($user_info['use'] === TRUE) {
-			$pid = get_post('id') === 'main' ? NULL : get_post('id');
-			$msg = $db->escape_string(strip_tags(get_post('message')));
-			$db->setQuery(
-				'createMessage',
+			$pid = $pid === 'main' ? NULL : $pid;
+			$msg = $db->escape_string(strip_tags($msg));
+			$db->qry(
 				$query,
 				$pid,
 				$user_info['uid'],
@@ -41,27 +27,82 @@ class MessengerController extends FootballChallengeController
 				1,
 				option('challenge_week')
 			);
-			if ($db->useQuery('createMessage')) {
-				$output->success = TRUE;
-			}
-			else {
-				#$log->log('error', 'Could not create a message.', $db->getQuery('createMessage'), $db->error);
-				$output->success = FALSE;
-			}
 		}
 		
-		header('Content-type: application/json');
-		return json_encode($output);
+		return ''; #self::getMessages();
 	}
 	
 	/* COMING SOON */
 	
 	static function edit($id) {
-		return 'Coming soon';
+		$db = option('db');
+		$log = option('log');
+		$query = 'UPDATE {{messages}} SET message = "%s" WHERE mid = %s';
+		$user_info = option('user_info');
+		$username = get_post('username');
+		
+		if ($user_info['use'] && $user_info['name'] === $username) {
+			$mid = get_post('mid');
+			$msg = $db->escape_string(strip_tags(get_post('message')));
+			
+			if (!$db->qry($query, $msg, $mid)) {
+				$log->log('error', "Attempt to update message $mid failed", $db->error);
+			}
+			
+			return json_encode($GLOBALS['_PUT']);
+		}
 	}
+	
+	
 	
 	static function delete($id) {
 		return 'Coming soon';
+	}
+	
+	/* Helpers */
+	
+	static function getMessages() {
+		$db = option('db');
+		$log = option('log');
+		$messages = array();
+		$query = 'SELECT m.mid AS mid, m.pid AS pid, m.message AS message, m.posted AS timestamp, u.username AS username, m.uid AS uid FROM {{messages}} m LEFT JOIN {{users}} u ON m.uid = u.uid WHERE m.active = 1 ORDER BY m.mid, m.pid, m.posted DESC';
+		
+		if ($results = $db->qry($query)) {
+			while ($obj = $results->fetch_object()) {
+				$obj->timestamp = $obj->timestamp * 1000;
+				$messages[] = $obj;
+			}
+		}
+		else {
+			$log->log('error', 'Could not get messeges.', $db->error);	
+		}
+		
+		$all = array();
+		foreach ($messages as $msg) {
+			// Make sure everyone has an replies array
+			if (!isset($msg->replies)) {
+				$msg->replies = array();
+			}
+			// Check for parent
+			if ($msg->pid) {
+				// Found a message with a parent, find it's parent in the messages
+				foreach ($messages as $msg2) {
+					if ($msg2->mid === $msg->pid) {
+						if (!isset($msg2->replies)) {
+							$msg2->replies = array();
+						}
+						// Found parent, push on the message						
+						$msg2->replies[] = $msg;
+					}
+				}
+			}
+			else {
+				$all[] = $msg;
+			}
+		}
+		
+		header('Content-type: application/json');
+		return json_encode($all);
 	}
 }
 ?>

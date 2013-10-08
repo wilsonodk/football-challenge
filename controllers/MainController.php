@@ -1,6 +1,6 @@
 <?php
 
-class MainController extends FootballChallengeController
+class MainController extends AppController
 {
 	static function home() {
 		// Get standings
@@ -14,7 +14,7 @@ class MainController extends FootballChallengeController
 
 	static function week_user($week_num, $username) {
 		// Do week stuff
-		$db = option('db_con');
+		$db = option('db');
 		
 		// Get user info
 		$logged_user = option('user_info');
@@ -29,7 +29,7 @@ class MainController extends FootballChallengeController
 			if ($week_num == $challenge_week) {
 				// Maybe
 				$now = time();
-				if ($result = $db->query('SELECT DISTINCT week FROM {{challenges}} WHERE closetime > %s AND year = %s', $now, FC_YEAR)) {
+				if ($result = $db->qry('SELECT DISTINCT week FROM {{challenges}} WHERE closetime > %s AND year = %s', $now, FC_YEAR)) {
 					while ($obj = $result->fetch_object()) {
 						$challenge_active = TRUE;
 						$show_form = TRUE;
@@ -49,12 +49,12 @@ class MainController extends FootballChallengeController
 			
 			// Get the challenge info
 			$challenge_info = array();
-			$challenge_query = 'SELECT c.cid, c.hsid AS home_sid, hs.school AS home_school, hs.conference AS home_conf, c.vsid AS away_sid, 
-				vs.school AS away_school, vs.conference AS away_conf, c.closetime, c.wsid AS winner_sid, c.gametime
+			$challenge_query = 'SELECT c.cid, c.home_sid AS home_sid, hs.school AS home_school, hs.conference AS home_conf, c.away_sid AS away_sid, 
+			 vs.school AS away_school, vs.conference AS away_conf, c.closetime, c.winner_sid AS winner_sid, c.gametime
 				FROM {{challenges}} c, {{schools}} hs, {{schools}} vs 
-				WHERE c.hsid = hs.sid AND c.vsid = vs.sid AND c.week = %d AND c.year = %d';
+				WHERE c.home_sid = hs.sid AND c.away_sid = vs.sid AND c.week = %d AND c.year = %d';
 				
-			if ($results = $db->query($challenge_query, $week_num, FC_YEAR)) {
+			if ($results = $db->qry($challenge_query, $week_num, FC_YEAR)) {
 				while ($obj = $results->fetch_object()) {
 					$temp = $obj;
 					$temp->gametime_formatted = date('D, M j \a\t g:i A T', $obj->gametime);
@@ -70,7 +70,7 @@ class MainController extends FootballChallengeController
 			$user_data->challenges = array();
 			if ($user_info['use']) {
 				$user_data_query = 'SELECT subvalue FROM {{submissions}} WHERE week = %s AND year = %s AND uid = %s';
-				if ($result = $db->query($user_data_query, $week_num, FC_YEAR, $user_info['uid'])) {
+				if ($result = $db->qry($user_data_query, $week_num, FC_YEAR, $user_info['uid'])) {
 					while ($obj = $result->fetch_object()) {
 						// Deserialize 
 						$user_data = unserialize($obj->subvalue);
@@ -106,7 +106,7 @@ class MainController extends FootballChallengeController
 	}
 
 	static function week_add($week_num) {
-		$db = option('db_con');
+		$db = option('db');
 		$log = option('log');
 		$user_info = option('user_info');
 		$submission = new StdClass;
@@ -156,13 +156,26 @@ class MainController extends FootballChallengeController
 					'UPDATE {{submissions}} SET subvalue = "%s" WHERE subkey = "%s"',
 					$submission,
 					$submission_key
+				)
+				// Update user
+				->setQuery(
+					'update-user-submission',
+					'UPDATE {{users}} SET submission = 1 WHERE uid = %s',
+					$user_info['uid']
 				);
 			
 			if ($result = $db->useQuery('check-submission')) {
 				if ($result->num_rows == 0) {
 					// New
 					if ($response = $db->useQuery('new-submission')) {
-						flash('message', 'Your submission has been saved.');
+						if ($db->useQuery('update-user-submission')) {				
+							flash('message', 'Your submission has been saved.');
+						}
+						else {
+							$log->log('error', 'Error updating user submission check for user "' . $user['name'] . '"');
+							flash('error:update user', 'There was an error while processing your submission.');
+							flash('error:try again', 'Please try again later.');
+						}
 					}
 					else {
 						$log->log('error', 'Error with new submission.', $db->error);
@@ -200,15 +213,15 @@ class MainController extends FootballChallengeController
 		$user_info = self::getUserInfoFromName($user);
 	
 		if ($user_info['name'] && $user_info['uid']) {
-			$db = option('db_con');
+			$db = option('db');
 			$log = option('log');
 			
 			$db
 			->setQuery(
 				'challenge',
-				'SELECT c.cid, c.week, c.hsid AS home_sid, hs.school AS home_school, 
-				hs.conference AS home_conf, c.vsid AS away_sid, vs.school AS away_school, vs.conference AS away_conf, c.wsid AS winner_sid 
-				FROM {{challenges}} c, {{schools}} hs, {{schools}} vs WHERE c.hsid = hs.sid AND c.vsid = vs.sid AND c.year = %s',
+				'SELECT c.cid, c.week, c.home_sid AS home_sid, hs.school AS home_school, 
+				hs.conference AS home_conf, c.away_sid AS away_sid, vs.school AS away_school, vs.conference AS away_conf, c.winner_sid AS winner_sid 
+				FROM {{challenges}} c, {{schools}} hs, {{schools}} vs WHERE c.home_sid = hs.sid AND c.away_sid = vs.sid AND c.year = %s',
 				FC_YEAR
 			)
 			->setQuery(
@@ -242,9 +255,50 @@ class MainController extends FootballChallengeController
 			}
 		
 			return self::template('main/picks.html.twig', array(
+				'page_name' => sprintf("%s's Picks", $user_info['name']),
 				'title' => sprintf('%s\'s Picks', strtoupper($user_info['name'])),
 				'challenges' => array_reverse($challenges),
 				'user_subs' => $user_challenge_info,
+			));
+		}
+		else {
+			halt(NOT_FOUND);
+		}
+	}
+	
+	static function picks_week($week) {
+		$db = option('db');
+		$log = option('log');
+		$year = FC_YEAR;
+		$db->setQuery(
+			'challenge',
+			'SELECT c.cid, c.week, c.home_sid AS home_sid, hs.school AS home_school, 
+			hs.conference AS home_conf, c.away_sid AS away_sid, vs.school AS away_school, vs.conference AS away_conf, c.winner_sid AS winner_sid 
+			FROM {{challenges}} c, {{schools}} hs, {{schools}} vs WHERE c.home_sid = hs.sid AND c.away_sid = vs.sid AND c.year = %s AND week = %s ORDER BY cid',
+			$year,
+			$week
+		);
+
+		if ($result = $db->useQuery('challenge')) {
+			$challenge = array();
+			while ($obj = $result->fetch_object()) {
+				$challenge[] = $obj;
+			}
+			
+			// Get all the user submissions for this week
+			$submissions = array();
+			if ($results = $db->qry('SELECT subvalue FROM {{submissions}} WHERE year = %s AND week = %s ORDER BY subkey', $year, $week)) {
+				while ($obj = $results->fetch_object()) {
+					$submissions[] = unserialize($obj->subvalue);
+				}
+			}
+			
+			return self::template('main/picks-week.html.twig', array(
+				'page_name' => "Week $week Picks",
+				'title'	=> "Week $week Picks",
+				'challenge' => $challenge,
+				'submissions' => $submissions,
+				'week_num' => $week,
 			));
 		}
 		else {
@@ -257,14 +311,14 @@ class MainController extends FootballChallengeController
 	/**************************************************************************/
 	
 	static function get_standings() {
-		$db	= option('db_con');
+		$db	= option('db');
 		$i = 1;
 		$score = 0;
 		$week = option('challenge_week');
 		$year = FC_YEAR;
 		$arr = array();
 		
-		if ($results = $db->query('SELECT username, wins, loses FROM {{users}} ORDER BY wins DESC, loses DESC, username')) {
+		if ($results = $db->qry('SELECT username, wins, loses, submission FROM {{users}} ORDER BY wins DESC, loses DESC, username')) {
 			while ($obj = $results->fetch_object()) {
 				$temp = new StdClass();
 				$temp->name	 = $obj->username;
@@ -272,12 +326,9 @@ class MainController extends FootballChallengeController
 				$temp->loses = $obj->loses;
 				$temp->ready = FALSE;
 				$temp->place = '';
-				$temp->path	 = "/week/$week/".strtolower($obj->username);
-				if (($temp->wins + $temp->loses) > 0) {
-					$temp->per = round(($temp->wins / ($temp->wins + $temp->loses)) * 100, 2);
-				} else {
-					$temp->per = 0;
-				}
+				$temp->path	 = ($obj->submission ? "/week/$week/" : '/picks/' ) . strtolower($obj->username);
+				$temp->alt	 = $obj->submission ? 'Picks for this week' : 'All picks';
+				$temp->per	 = round(($temp->wins / ($temp->wins + $temp->loses)) * 100, 2);
 
 				// Set proper place
 				if ($temp->wins !== $score) {
@@ -286,11 +337,12 @@ class MainController extends FootballChallengeController
 				}
 				
 				// Get ready state
-				if ($result = $db->query('SELECT subkey FROM {{submissions}} WHERE name = "%s" AND week = "%s" AND year = "%s"', $temp->name, $week, $year)) {
+				$temp->ready = $obj->submission;
+				/*if ($result = $db->qry('SELECT subkey FROM {{submissions}} WHERE name = "%s" AND week = "%s" AND year = "%s"', $temp->name, $week, $year)) {
 					while ($item = $result->fetch_object()) {
 						$temp->ready = $item->subkey ? TRUE : FALSE;
 					}
-				}
+				}*/
 				
 				$i++;
 				$arr[] = $temp;

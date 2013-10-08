@@ -2,7 +2,6 @@
 
 {% block content %}
 	{{ parent() }}
-	<h2>Commissioner Tasks</h2>
 	
 	<table class="admin-status">
 		<tr>
@@ -18,27 +17,27 @@
 	<h3>Weekly Challenge Tasks</h3>
 	<ul>
 		<li>{{ _self.challenge_link(challenge_state, base_admin, macros) }}</li>
-		<li>{{ macros.ahref("/standings", "Re-run Standings", base_admin) }}</li>
-		<li>{{ macros.ahref("/challenge/check", "Check Games", base_admin) }} <span style="color: #999; font-size: smaller;">(This is automated)</span></li>
+		<li>{{ macros.link("/standings", "Re-run Standings", base_admin) }}</li>
+		<li>{{ macros.link("/challenge/check", "Check Games", base_admin) }} <span style="color: #999; font-size: smaller;">(This is automated)</span></li>
 	</ul>
 	
 	<h3>Player Tasks</h3>
 	<ul>
-		<li>{{ macros.ahref("/player/new", "Create New Player", base_admin) }}</li>
-		<li>{{ macros.ahref("/players", "View All Players", base_admin) }}</li>
+		<li>{{ macros.link("/player/new", "Create New Player", base_admin) }}</li>
+		<li>{{ macros.link("/players", "View All Players", base_admin) }}</li>
 	</ul>
 	
 	<h3>Other Tasks</h3>
 	<ul>
-		<li>{{ macros.ahref("/logs", "View Logs", base_admin) }}</li>
+		<li>{{ macros.link("/logs", "View Logs", base_admin) }}</li>
 	</ul>
 {% endblock %}
 
 {% macro challenge_link(state, base, m) %}
 	{% if state == 'create' %}
-		{{ m.ahref("/challenge", "Create New Challenge", base) }}
+		{{ m.link("/challenge", "Create New Challenge", base) }}
 	{% elseif state == 'edit' %}
-		{{ m.ahref("/challenge/edit", "Edit Current Challenge", base) }}
+		{{ m.link("/challenge/edit", "Edit Current Challenge", base) }}
 	{% elseif state == 'wait' %}
 		Waiting on current Challenge to finish
 	{% else %}
