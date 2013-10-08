@@ -177,6 +177,8 @@ function configure() {
     }
     option('all_users', $all_users);
 
+    option('build_version', file_get_contents('BUILD_VERSION.txt'));
+    option('app_version', file_get_contents('VERSION.txt'));
 }
 
 function before() {

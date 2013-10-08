@@ -2,79 +2,79 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8" />
-	<title>{{ site_name }} &ndash; {{ page_name }}</title>
-	{# Messenger template #}
-	{% block messenger_template %}
-	{% endblock %}
-	<link rel="shortcut icon" href="http://wilson.odk.com/fc-favicon.ico" />
-	<link rel="stylesheet" type="text/css" href="{{ base_path }}/public/app.css" />
-	<script type="text/javascript" src="{{ base_path }}/public/jquery-1.8.2.min.js"></script>
-	<script type="text/javascript" src="{{ base_path }}/public/app.js"></script>
-	{% block head %}
-	{% endblock %}
+    <meta charset="utf-8" />
+    <title>{{ site_name }} &ndash; {{ page_name }}</title>
+    {# Messenger template #}
+    {% block messenger_template %}
+    {% endblock %}
+    <link rel="shortcut icon" href="http://wilson.odk.com/fc-favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="{{ base_path }}/public/app.css" />
+    <script type="text/javascript" src="{{ base_path }}/public/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="{{ base_path }}/public/app.js"></script>
+    {% block head %}
+    {% endblock %}
 </head>
 <body>
 <div id="wings"><img src="{{ base_path }}/public/fc-wings-full.jpg" width="1800" height="1200" /></div>
 <div id="wrapper">
-	{# Header #}
-	<div id="header">
-		<h1>{{ macros.link('/', site_name, base_path) }}</h1>
-		<ul>
-			<li id="home">{{ macros.link('/', 'Home', base_path) }}</li>
-			{% for week in challenge_weeks %}
-				<li id="week-{{ week.num }}">{{ macros.link(week.path, week.name, base_path) }}</li>
-			{% endfor %}
-		</ul>
-		<div class="account-area">
-			{% if user_info.uid %}
-				<p>
-					{{ macros.link('/my-account', user_info.name, base_path) }} |
-					{% if user_info.perms == 2 %}{{ macros.link('/commissioner', 'Commissioner', base_path) }} | {% endif %}
-					{{ macros.link('/logout', 'Logout', base_path) }}
-				</p>
-			{% else %}
-				<p>{{ macros.link('/login', 'Login', base_path) }}</p>
-			{% endif %}
-		</div>
-	</div>
+    {# Header #}
+    <div id="header">
+        <h1>{{ macros.link('/', site_name, base_path) }}</h1>
+        <ul>
+            <li id="home">{{ macros.link('/', 'Home', base_path) }}</li>
+            {% for week in challenge_weeks %}
+                <li id="week-{{ week.num }}">{{ macros.link(week.path, week.name, base_path) }}</li>
+            {% endfor %}
+        </ul>
+        <div class="account-area">
+            {% if user_info.uid %}
+                <p>
+                    {{ macros.link('/my-account', user_info.name, base_path) }} |
+                    {% if user_info.perms == 2 %}{{ macros.link('/commissioner', 'Commissioner', base_path) }} | {% endif %}
+                    {{ macros.link('/logout', 'Logout', base_path) }}
+                </p>
+            {% else %}
+                <p>{{ macros.link('/login', 'Login', base_path) }}</p>
+            {% endif %}
+        </div>
+    </div>
 
-	{# Site Message Here #}
-	{% block site_message %}
-		{% if have_flash_errors %}
-			<div id="message" class="error">
-				{% for message in flash_errors %}
-					<p>{{ message }}</p>
-				{% endfor %}
-			</div>
-		{% endif %}
-		{% if have_flash_messages %}
-			<div id="message" class="normal">
-				{% for message in flash_messages %}
-					<p>{{ message }}</p>
-				{% endfor %}
-			</div>
-		{% endif %}
-	{% endblock %}
+    {# Site Message Here #}
+    {% block site_message %}
+        {% if have_flash_errors %}
+            <div id="message" class="error">
+                {% for message in flash_errors %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if have_flash_messages %}
+            <div id="message" class="normal">
+                {% for message in flash_messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endblock %}
 
-	{# Content #}
-	<div id="content">
-	{% block content %}
-	{% endblock %}
-	</div>
+    {# Content #}
+    <div id="content">
+    {% block content %}
+    {% endblock %}
+    </div>
 
-	{# Footer #}
-	{% block footer %}
-		<div id="footer">
-			<div>
-				<p>Weekly Results &rarr; 
-				{% for user in footer %}
-					{{ macros.link(user.path, user.name, base_path)|raw }}{% if not loop.last %} | {% endif %}
-				{% endfor %}</p>
-				<p>Junkies Football Challenge &copy;2011&ndash;2012 Wilson Wise. All rights reserved.</p>
-			</div>
-		</div>
-	{% endblock %}
+    {# Footer #}
+    {% block footer %}
+        <div id="footer">
+            <div>
+                <p>Weekly Results &rarr;
+                {% for user in footer %}
+                    {{ macros.link(user.path, user.name, base_path)|raw }}{% if not loop.last %} | {% endif %}
+                {% endfor %}</p>
+                <p><a href="https://github.com/wilsonodk/football-challenge/tree/{{ app_version }}" title="Football Challenge ({{ build_version|trim }})">Football Challenge</a> &copy;2011&ndash;2013 Wilson Wise. All rights reserved.</p>
+            </div>
+        </div>
+    {% endblock %}
 </div>
 </body>
 </html>
