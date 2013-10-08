@@ -8,7 +8,7 @@
 {% endmacro %}
 
 {% macro img(src, width, height, alt) %}
-	<img src="{{ src|one_space }}" width="{{ width }}" height="{{ height }}" border="0" alt="{{ alt }}" />
+	<img src="{{ src|one_space }}" width="{{ width }}" height="{{ height }}" border="0"{% if alt %} alt="{{ alt }}" title="{{ alt }}" {% endif %}/>
 {% endmacro %}
 
 {# Additional Macros #}
@@ -49,7 +49,7 @@
 {% macro challenge_school_cells(active, id, school_id, school, conference, class, icon, selected, show_form) %}
 	<td class="{{ class|one_space }}">
 		{% if active and show_form %}
-			<input type="radio" name="challenge-{{ id }}" id="challenge-{{ school_id }}" value="{{ school_id }}" {{ selected|trim }} />	
+			<input type="radio" name="challenge-{{ id }}" id="challenge-{{ school_id }}" value="{{ school_id }}" {{ selected|trim }} />
 		{% elseif icon %}
 			{{ icon }}
 		{% else %}
@@ -101,7 +101,7 @@
 					{% endif %}
 				{% endif %}
 			{% endfor %}
-		
+
 			{# Away #}
 			{% set away_class %}
 				team-{{ challenge.away_sid }}{{ _self.user_pick_class(challenge.cid, challenge.winner_sid, challenge.away_sid, user) }}
@@ -110,7 +110,7 @@
 				{{ _self.get_icon(challenge.away_sid, challenge.winner_sid, base_path) }}
 			{% endset %}
 			{{ _self.challenge_school_cells(challenge.active, challenge.cid, challenge.away_sid, challenge.away_school, challenge.away_conf, away_class, away_icon, is_away_picked, show_form) }}
-			
+
 			{# Home #}
 			{% set home_class %}
 				team-{{ challenge.home_sid }}{{ _self.user_pick_class(challenge.cid, challenge.winner_sid, challenge.home_sid, user) }}
@@ -127,7 +127,7 @@
 {% macro win_loss_count(challenges, user_picks, base_path) %}
 	{% set wins = 0 %}
 	{% set losses = 0 %}
-	
+
 	{% for challenge in challenges %}
 		{% for pick in user_picks %}
 			{% if challenge.cid == pick.cid %}
@@ -139,11 +139,11 @@
 			{% endif %}
 		{% endfor %}
 	{% endfor %}
-	
+
 	{% if wins == 0 and losses == 0 %}
 		{% set losses = 10 %}
 	{% endif %}
-	
+
 	<p>
 		<span class="pick-results won">
 			{{ _self.icon_win(base_path) }}
@@ -225,7 +225,7 @@
 								{% set wins_count = wins_count + 1 %}
 							{% else %}
 								{% set lose_count = lose_count + 1 %}
-							{% endif %}							
+							{% endif %}
 						{% endif %}
 					{% endif %}
 				{% endfor %}
