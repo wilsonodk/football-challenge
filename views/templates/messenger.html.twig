@@ -4,34 +4,34 @@
 <script src="{{ base_path }}/public/backbone-min.js"></script>
 <script src="{{ base_path }}/public/messages.js"></script>
 <script>
-	var basePath = "{{ base_path }}";
+    var basePath = "{{ base_path }}";
 </script>
 {% endblock %}
 
 {% block messenger_template %}
 <script type="text/template" id="message-template">
-	<span class="message-text"><%= message %></span>
-	<div class="tools">
-		By <strong><%= username %></strong> on <em><%= posted %></em>
-		<span style="display: inline;">
-			<br /><a class="reply" href="javascript:;">Reply</a>
-		</span>
-		<div class="input-area">
-			<textarea class="reply-textarea" rows="2" name="message"></textarea>
-			<br><input class="reply-button" type="button" value="Reply"> or 
-			<a class="reply-cancel" href="javascript:;">Cancel</a>
-		</div>
-	</div>
-	<div class="replies"></div>
+    <span class="message-text"><%= message %></span>
+    <div class="tools">
+        By <strong><%= username %></strong> on <em><%= posted %></em>
+        <span style="display: inline;">
+            <br /><a class="reply" href="javascript:;">Reply</a>
+        </span>
+        <div class="input-area">
+            <textarea class="reply-textarea" rows="2" name="message"></textarea>
+            <br><input class="reply-button" type="button" value="Reply"> or
+            <a class="reply-cancel" href="javascript:;">Cancel</a>
+        </div>
+    </div>
+    <div class="replies"></div>
 </script>
 <script type="text/template" id="input-template">
-	<textarea rows="2" name="message" disabled="disabled" id="messenger-textarea-main"></textarea><br />
-	<input type="button" value="Reply" id="messenger-input-main-reply" disabled="disabled" />
+    <textarea rows="2" name="message" disabled="disabled" id="messenger-textarea-main"></textarea><br />
+    <input type="button" value="Reply" id="messenger-input-main-reply" disabled="disabled" />
 </script>
 {% endblock %}
 
 {% block messenger %}
 <div id="messenger">
-	<div id="all-messages"></div>
+    <div id="all-messages"></div>
 </div>
 {% endblock %}

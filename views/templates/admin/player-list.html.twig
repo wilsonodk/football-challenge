@@ -1,19 +1,19 @@
 {% extends "admin/admin.html.twig" %}
 
 {% block content %}
-	{{ parent() }}
-	
-	<h2>Player List</h2>
-	
-	<ul id="player-admin">
-	{% for player in players %}
-		{% set view %}/player/{{ player.uid }}{% endset %}
-		{% set edit %}/player/{{ player.uid }}/edit{% endset %}
-		{% set del %}/player/{{ player.uid }}/delete{% endset %}
-		<li><span class="name">{{ player.name }}</span> <span class="actions">{{ macros.link(view, "View", base_admin) }} | {{ macros.link(edit, "Edit", base_admin) }} | {{ macros.link(del, "Delete", base_admin) }}</span></li>
-	{% endfor %}
-	</ul>
-	
-	<p>{{ macros.link("", "Back", base_admin) }} or {{ macros.link("/player/new", "Create New Player", base_admin) }}</p>
-	
+    {{ parent() }}
+
+    <h2>Player List</h2>
+
+    <ul id="player-admin">
+    {% for player in players %}
+        {% set view %}/player/{{ player.uid }}{% endset %}
+        {% set edit %}/player/{{ player.uid }}/edit{% endset %}
+        {% set del %}/player/{{ player.uid }}/delete{% endset %}
+        <li><span class="name">{{ player.name }}</span> <span class="actions">{{ macros.link(view, "View", base_admin) }} | {{ macros.link(edit, "Edit", base_admin) }} | {{ macros.link(del, "Delete", base_admin) }}</span></li>
+    {% endfor %}
+    </ul>
+
+    <p>{{ macros.link("", "Back", base_admin) }} or {{ macros.link("/player/new", "Create New Player", base_admin) }}</p>
+
 {% endblock %}

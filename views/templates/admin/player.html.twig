@@ -1,45 +1,45 @@
 {% extends "admin/admin.html.twig" %}
 
 {% block content %}
-	{{ parent() }}
-	{% set method %}{% if activity == 'Create' %}POST{% elseif activity == 'Edit' %}PUT{% elseif activity == 'Delete' %}DELETE{% else %}VIEW{% endif %}{% endset %}
-	
-	<h2>{{ activity }} Player</h2>
-	
-	{% if method != 'VIEW' %}
-		<form action="{{ action_url }}" method="POST" class="account-form">
-			<input type="hidden" name="_method" value="{{ method }}" id="_method" />
-	{% endif %}
-	
-	<h3>Username</h3>
-	<p>{% if activity == 'Create' or activity == 'Edit' %}<input type="text" name="username" value="{{ player.name }}" />{% else %}{{ player.name }}{% endif %}</p>
-	
-	<h3>Email</h3>
-	<p>{% if activity == 'Create' or activity == 'Edit' %}<input type="text" name="email" value="{{ player.email }}" />{% else %}{{ player.email }}{% endif %}</p>
-	
-	{% if activity == 'Create' or activity == 'Edit' %}
-	<h3>{% if activity == 'Edit' %}Reset {% endif %}Password</h3>
-	<p>{% if activity == 'Create' or activity == 'Edit' %}<input type="password" name="password" value="{{ player.password|default('feesball') }}" />{% else %}{{ player.password }}{% endif %}</p>
-	{% endif %}
-	
-	<h3>Permissions</h3>
-	{% if activity == 'Create' or activity == 'Edit' %}
-		{% spaceless %}
-			<p><select name="permissions">
-				<option value="1" {% if player.perms == 1 %}selected="selected"{% endif %}>Player</option>
-				<option value="2" {% if player.perms == 2 %}selected="selected"{% endif %}>Commissioner</option>
-			</select></p>
-		{% endspaceless %}
-	{% else %}
-		<p>{% if player.perms == 1 %}Player{% elseif player.perms == 2 %}Commissioner{% else %}Unknown{% endif %}</p>
-	{% endif %}
-	
-	<p>&nbsp;</p>
-	
-	{% if method == 'VIEW' %}
-		<p>{{ macros.link('/edit', 'Edit', player.uid) }} | {{ macros.link('/delete', 'Delete', player.uid) }}</p>
-	{% else %}
-			<p><input type="submit" value="{{ activity }} Player" /> or {{ macros.link("/player", "Cancel", base_admin)|trim|raw }}.</p>
-		</form>
-	{% endif %}
+    {{ parent() }}
+    {% set method %}{% if activity == 'Create' %}POST{% elseif activity == 'Edit' %}PUT{% elseif activity == 'Delete' %}DELETE{% else %}VIEW{% endif %}{% endset %}
+
+    <h2>{{ activity }} Player</h2>
+
+    {% if method != 'VIEW' %}
+        <form action="{{ action_url }}" method="POST" class="account-form">
+            <input type="hidden" name="_method" value="{{ method }}" id="_method" />
+    {% endif %}
+
+    <h3>Username</h3>
+    <p>{% if activity == 'Create' or activity == 'Edit' %}<input type="text" name="username" value="{{ player.name }}" />{% else %}{{ player.name }}{% endif %}</p>
+
+    <h3>Email</h3>
+    <p>{% if activity == 'Create' or activity == 'Edit' %}<input type="text" name="email" value="{{ player.email }}" />{% else %}{{ player.email }}{% endif %}</p>
+
+    {% if activity == 'Create' or activity == 'Edit' %}
+    <h3>{% if activity == 'Edit' %}Reset {% endif %}Password</h3>
+    <p>{% if activity == 'Create' or activity == 'Edit' %}<input type="password" name="password" value="{{ player.password|default('feesball') }}" />{% else %}{{ player.password }}{% endif %}</p>
+    {% endif %}
+
+    <h3>Permissions</h3>
+    {% if activity == 'Create' or activity == 'Edit' %}
+        {% spaceless %}
+            <p><select name="permissions">
+                <option value="1" {% if player.perms == 1 %}selected="selected"{% endif %}>Player</option>
+                <option value="2" {% if player.perms == 2 %}selected="selected"{% endif %}>Commissioner</option>
+            </select></p>
+        {% endspaceless %}
+    {% else %}
+        <p>{% if player.perms == 1 %}Player{% elseif player.perms == 2 %}Commissioner{% else %}Unknown{% endif %}</p>
+    {% endif %}
+
+    <p>&nbsp;</p>
+
+    {% if method == 'VIEW' %}
+        <p>{{ macros.link('/edit', 'Edit', player.uid) }} | {{ macros.link('/delete', 'Delete', player.uid) }}</p>
+    {% else %}
+            <p><input type="submit" value="{{ activity }} Player" /> or {{ macros.link("/player", "Cancel", base_admin)|trim|raw }}.</p>
+        </form>
+    {% endif %}
 {% endblock %}
