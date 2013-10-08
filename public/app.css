@@ -1,448 +1,448 @@
 * {
-	margin: 0;
-	padding: 0;
+    margin:  0;
+    padding: 0;
 }
 body {
-	background-color: #fff;
-	font-family: Verdana, san-serif;
-	margin-bottom: 120px;
+    background-color: #fff;
+    font-family: Verdana, san-serif;
+    margin-bottom: 120px;
 }
 h1 {
-	margin-left: 20px;
+    margin-left: 20px;
 }
 h2 {
-	font-size: 16px;
-	color: #333;
-	margin-top: 10px;
-	margin-left: 20px;
+    font-size: 16px;
+    color: #333;
+    margin-top: 10px;
+    margin-left: 20px;
 }
 h3 {
-	font-size: 13px;
-	color: #666;
-	margin-top: 10px;
-	margin-bottom: 5px;
-	margin-left: 20px;
+    font-size: 13px;
+    color: #666;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    margin-left: 20px;
 }
 p {
-	font-size: 12px;
-	line-height: 1.5em;
-	margin: 10px 0;	
-	margin-left: 20px;
+    font-size: 12px;
+    line-height: 1.5em;
+    margin: 10px 0;
+    margin-left: 20px;
 }
 
 table {
-	width: 100%;
-	background-color: #fff;
+    width: 100%;
+    background-color: #fff;
 }
 th {
-	font-size: 14px;
-	line-height: 1.5em;
-	padding: 1px 3px;
+    font-size: 14px;
+    line-height: 1.5em;
+    padding: 1px 3px;
 }
 td {
-	font-size: 12px;
-	line-height: 1.5em;
-	padding: 2px 3px;
+    font-size: 12px;
+    line-height: 1.5em;
+    padding: 2px 3px;
 }
 
 label {
-	color: #666;
-	font-size: 12px;
-	line-height: 1.5em;
+    color: #666;
+    font-size: 12px;
+    line-height: 1.5em;
 }
 .week-table label {
-	color: #000;
+    color: #000;
 }
 
 option {
-	font-size: 12px;
-	line-height: 1.5em;
+    font-size: 12px;
+    line-height: 1.5em;
 }
 
 a,
 a:link,
 a:visited {
-	color: #009;
-	font-weight: bold;
-	text-decoration: none;
+    color: #009;
+    font-weight: bold;
+    text-decoration: none;
 }
 a:hover,
 a:active {
-	text-decoration: underline;
+    text-decoration: underline;
 }
 
 #wings {
-	position: fixed; 
-	top: 0px; 
-	width: 1800px; 
-	height: 1200px; 
-	overflow: hidden; 
-	left: 0;
-	z-index: -1;
+    position: fixed;
+    top: 0px;
+    width: 1800px;
+    height: 1200px;
+    overflow: hidden;
+    left: 0;
+    z-index: -1;
 }
 
 #wrapper {
-	position: relative;
-	width: 900px;
-	margin: 0 auto;
+    position: relative;
+    width: 900px;
+    margin: 0 auto;
 }
 
 #header {
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 55px;
-	background-color: #009;
-	color: #fff;
-	padding: 10px 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 55px;
+    background-color: #009;
+    color: #fff;
+    padding: 10px 0;
 }
 #header ul {
-	margin-top: 5px;
-	margin-left: 20px;
-	list-style-type: none;
-	background-color: #ddd;
+    margin-top: 5px;
+    margin-left: 20px;
+    list-style-type: none;
+    background-color: #ddd;
 }
 #header li {
-	float: left;
-	display: block;
-	width: auto;
+    float: left;
+    display: block;
+    width: auto;
 }
 #header li a {
-	display: block;
-	font-size: 12px;
-	line-height: 1.5em;
-	background-color: #ddd;
-	text-align: center;
-	padding: 1px 3px;
-	margin: 0 1px;
+    display: block;
+    font-size: 12px;
+    line-height: 1.5em;
+    background-color: #ddd;
+    text-align: center;
+    padding: 1px 3px;
+    margin: 0 1px;
 }
 #header li a:hover {
-	background-color: #fff;
-	text-decoration: none;
+    background-color: #fff;
+    text-decoration: none;
 }
 #header li.selected a {
-	color: #333;
-	background-color: #fff;
+    color: #333;
+    background-color: #fff;
 }
 #header h1 a {
-	color: #fff;
-	text-decoration: none;
+    color: #fff;
+    text-decoration: none;
 }
 #header .account-area {
-	position: absolute;
-	top: 0;
-	right: 0;
-/*	width: 350px;
-	height: 23px;*/
-	font-size: 10px;
-	padding: 3px 10px;
-	color: #fff;
-	text-align: right;
+    position: absolute;
+    top: 0;
+    right: 0;
+/*  width: 350px; */
+/*  height: 23px; */
+    font-size: 10px;
+    padding: 3px 10px;
+    color: #fff;
+    text-align: right;
 }
 #header .account-area p {
-	margin: 0;
+    margin: 0;
 }
 #header .account-area a,
 #header .account-area a:link,
 #header .account-area a:visited {
-	font-weight: normal;
-	text-decoration: none;
-	color: #fff;
+    font-weight: normal;
+    text-decoration: none;
+    color: #fff;
 }
 #header .account-area a:hover,
 #header .account-area a:active {
-	text-decoration: underline;
+    text-decoration: underline;
 }
 
 #message {
-	margin: 5px 20px;
-	padding: 0 10px;
-	width: 50%;
+    margin: 5px 20px;
+    padding: 0 10px;
+    width: 50%;
 }
 .message,
 .normal {
-	background-color: #efe;
-	border: 1px solid #090;
+    background-color: #efe;
+    border: 1px solid #090;
 }
 .error {
-	background-color: #fee;
-	border: 1px solid #900;
+    background-color: #fee;
+    border: 1px solid #900;
 }
 #content .picks td.picked.won,
 .won {
-	background-color: #efe;
-	font-weight: bold;
-	color: #090;
+    background-color: #efe;
+    font-weight: bold;
+    color: #090;
 }
 #content .picks td.picked.lost,
 .lost {
-	background-color: #fee;
-	font-weight: bold;
-	color: #900;
+    background-color: #fee;
+    font-weight: bold;
+    color: #900;
 }
 .user-pick {
-	background-color: #ffe;
-	font-weight: bold;
+    background-color: #ffe;
+    font-weight: bold;
 }
 .user-pick label {
-	color: #000;
+    color: #000;
 }
 #content .user-pick-won,
 #content .user-pick-won .conference {
-	background-color: #efe;
-	color: #090;
+    background-color: #efe;
+    color: #090;
 }
 .user-pick-won label {
-	color: #090;
+    color: #090;
 }
 #content .user-pick-lost,
 #content .user-pick-lost .conference {
-	background-color: #fee;
-	color: #900;
+    background-color: #fee;
+    color: #900;
 }
 .user-pick-lost label {
-	color: #900;
+    color: #900;
 }
 .waiting {
-	background-color: #eee;
-	font-weight: bold;
-	color: #666;
+    background-color: #eee;
+    font-weight: bold;
+    color: #666;
 }
 .pick-results {
-	padding: 1px 5px;
-	border: 1px solid #999;
+    padding: 1px 5px;
+    border: 1px solid #999;
 }
 .result {
-	border-left-width: 0;
+    border-left-width: 0;
 }
 #content {
-	top: 80px;
-	margin: 0;
-	width: 100%;
-	height: auto;
+    top: 80px;
+    margin: 0;
+    width: 100%;
+    height: auto;
 }
 #content table {
-	border-collapse: collapse;
+    border-collapse: collapse;
 }
 #content ul {
-	margin: 5px 35px;
-	
+    margin: 5px 35px;
+
 }
 #content li {
-	font-size: 14px;
-	line-height: 1.5em;
-	margin: 5px 0;
+    font-size: 14px;
+    line-height: 1.5em;
+    margin: 5px 0;
 }
 #content li span {
-	font-size: 12px;
-	color: #666;
+    font-size: 12px;
+    color: #666;
 }
 #content .conference {
-	color: #666;
-	font-size: 10px;
-/*	font-weight: bold;*/
+    color: #666;
+    font-size: 10px;
+/*  font-weight: bold; */
 }
 #content tr {
-	border-bottom: 1px solid #999;
+    border-bottom: 1px solid #999;
 }
 #content tr.even {
-	
+
 }
 #content tr.odd {
-	
+
 }
 #content th {
-	background-color: #eee;
+    background-color: #eee;
 }
 #content td.picked {
-	font-weight: bold;
-	background-color: #ffe;
+    font-weight: bold;
+    background-color: #ffe;
 }
 
 #content .picks {
-	width: 450px;
-	/* margin: 0; */
-	float: left;
+    width: 450px;
+/*  margin: 0; */
+    float: left;
 }
 #content .picks {
-	width: 750px;
-	margin-left: 20px;
-	float: none;	
+    width: 100%;
+    margin-left: 20px;
+    float: none;
 }
 #content .picks .week-table {
-	width: 100%;
+    width: 600px;
 }
 #content .picks-right {}
 #content .picks-left {}
 
 .gametime td {
-	text-align: center;
-	font-size: 10px;
-	background-color: #eef;
-	color: #999;
+    text-align: center;
+    font-size: 10px;
+    background-color: #eef;
+    color: #999;
 }
 .time {
-	color: #666;
-	font-size: 10px;
+    color: #666;
+    font-size: 10px;
 }
 .time span {
-	color: #999;
-	font-size: 9px;
+    color: #999;
+    font-size: 9px;
 }
 #content tr.gametime {
-	border-bottom: 0;
+    border-bottom: 0;
 }
 
 .standings-table {
-	width: 350px;
-	padding: 1px; 
-	border: 1px solid #999;
-	margin-left: 20px;
+    width: 350px;
+    padding: 1px;
+    border: 1px solid #999;
+    margin-left: 20px;
 }
 
 .challenge-table {
-	width: 400px;
-	padding: 1px; 
-	border: 1px solid #ccc;	
-	margin-left: 20px;
+    width: 400px;
+    padding: 1px;
+    border: 1px solid #ccc;
+    margin-left: 20px;
 }
 
 .week-table {
-	min-width: 400px;
-	max-width: 500px;
-	width: auto;
-	padding: 1px; 
-	border: 1px solid #999;
-	margin-left: 20px;
+    min-width: 400px;
+    max-width: 500px;
+    width: auto;
+    padding: 1px;
+    border: 1px solid #999;
+    margin-left: 20px;
 }
 .admin-status {
-	width: 300px;
-	margin: 0 20px;
-	border: solid 1px #999;
-	float: right;
+    width: 300px;
+    margin: 0 20px;
+    border: solid 1px #999;
+    float: right;
 }
 .admin-status td {
-	text-align: center;
+    text-align: center;
 }
 .picks .week-table, .picks h2, .picks h3, .picks p {
-	margin-left: 5px;	
+    margin-left: 5px;
 }
 
 .winning-table {
-	width: 850px;
-	padding: 1px; 
-	border: 1px solid #ccc;
+    width: 850px;
+    padding: 1px;
+    border: 1px solid #ccc;
 }
 
 #player-status {
-	float: right;
-	margin-right: 50px;
-	border-left: 1px dotted #999;
+    float: right;
+    margin-right: 50px;
+    border-left: 1px dotted #999;
 }
 #player-status ul {
-	margin-left: 20px;
-	list-style-type: none;
+    margin-left: 20px;
+    list-style-type: none;
 }
 #player-status li {
-	font-size: 11px;
+    font-size: 11px;
 }
 #player-status .waiting-list {
-	float: left;
+    float: left;
 }
 #player-status .finished-list {
-	float: right;
+    float: right;
 }
 #player-status .h4 {
-	font-weight: bold;
+    font-weight: bold;
 }
 #player-status .waiting-list .h4 {
-	color: #900;
+    color: #900;
 }
 #player-status .finished-list .h4 {
-	color: #090;
+    color: #090;
 }
 #log {
-	background-color: #333;
-	padding: 5px 10px;
-	width: 835px;
-	height: 470px;
-	margin-left: 20px;
-	overflow: auto;
+    background-color: #333;
+    padding: 5px 10px;
+    width: 835px;
+    height: 470px;
+    margin-left: 20px;
+    overflow: auto;
 }
 #log p {
-	margin: 0;
-	font-family: monospace;
-	color: #fff;
+    margin: 0;
+    font-family: monospace;
+    color: #fff;
 }
 #log .stamp {
-	color: #ffc;
+    color: #ffc;
 }
 #log .error {
-	border: 0;
-	background-color: inherit;
-	color: #f66;
-	font-weight: bold;
+    border: 0;
+    background-color: inherit;
+    color: #f66;
+    font-weight: bold;
 }
 #log .warning {
-	color: #fc0;
+    color: #fc0;
 }
 #log .message {
-	border: 0;
-	background-color: inherit;
-	color: #eee;
+    border: 0;
+    background-color: inherit;
+    color: #eee;
 }
 
 #footer {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	background-color: #ccc;
-	padding: 5px 0;
-	border-top: 1px solid #009;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ccc;
+    padding: 5px 0;
+    border-top: 1px solid #009;
 }
 #footer div {
-	width: 900px;
-	margin: 0 auto;
+    width: 900px;
+    margin: 0 auto;
 }
 #footer p {
-	font-size: 12px;
-	line-height: 1.5em;
+    font-size: 12px;
+    line-height: 1.5em;
 }
 .account-form input[type="text"],
 .account-form input[type="password"] {
-	width: 250px;
-	padding: 2px 3px;
-	font-size: 12px;
+    width: 250px;
+    padding: 2px 3px;
+    font-size: 12px;
 }
 #player-admin li {
-	width: 50%;
-	list-style-type: none;
-	margin-left: -20px;
-	padding-left: 5px;
-	padding-right: 10px;
+    width: 50%;
+    list-style-type: none;
+    margin-left: -20px;
+    padding-left: 5px;
+    padding-right: 10px;
 }
 #player-admin li .name {
-	color: #333;
-	font-weight: bold;
-	display: inline-block;
-	width: 150px;
+    color: #333;
+    font-weight: bold;
+    display: inline-block;
+    width: 150px;
 }
 #player-admin li:hover {
-	background-color: #ddd;
+    background-color: #ddd;
 }
 #player-admin li .actions {
-	font-size: 10px;
-	font-weight: normal;
-	float: right;
+    font-size: 10px;
+    font-weight: normal;
+    float: right;
 }
 #player-admin li .actions a {
-	font-weight: normal;
+    font-weight: normal;
 }
 .delete {
-	padding: 3px 5px;
-	border: 1px solid #fff;
-	border-color: #900 #009;
-	background-color: #fee;
-	color: #900;
+    padding: 3px 5px;
+    border: 1px solid #fff;
+    border-color: #900 #009;
+    background-color: #fee;
+    color: #900;
 }
