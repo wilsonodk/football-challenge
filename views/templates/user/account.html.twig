@@ -1,42 +1,42 @@
 {% extends "base.html.twig" %}
 
 {% block head %}
-	{{ parent() }}
+    {{ parent() }}
 {% endblock %}
 
 {% block content %}
-	{{ parent() }}
+    {{ parent() }}
 
-	<h2>{{ username }}&apos;s Account Page</h2>
+    <h2>{{ username }}&apos;s Account Page</h2>
 
-	<form method="post" action="{{ base_path }}/my-account" class="account-form">
-		<input type="hidden" name="_method" value="PUT" id="_method" />
-		<input type="hidden" name="uid" value="{{ uid }}" />
-		<input type="hidden" name="username" value="{{ username }}" />
-		<input type="hidden" name="current_email" value="{{ email }}" />
-		
-		<h3>Update Email</h3>
-		
-		<p><label>Email</label>
-		<br /><input type="text" name="email" value="{{ email }}"></p>
-	
-		<p>&nbsp;</p>
-	
-		<h3>Change Password</h3>
+    <form method="post" action="{{ base_path }}/my-account" class="account-form">
+        <input type="hidden" name="_method" value="PUT" id="_method" />
+        <input type="hidden" name="uid" value="{{ uid }}" />
+        <input type="hidden" name="username" value="{{ username }}" />
+        <input type="hidden" name="current_email" value="{{ email }}" />
 
-		<input type="hidden" name="_method" value="PUT" id="_method" />
-		<input type="hidden" name="uid" value="{{ uid }}" />
-		<input type="hidden" name="username" value="{{ username }}" />
+        <h3>Update Email</h3>
 
-		<p><label>Current Password</label>
-		<br /><input type="password" name="password"></p>
-		
-		<p><label>New Password</label>
-		<br /><input type="password" name="new-password"></p>
+        <p><label>Email</label>
+        <br /><input type="text" name="email" value="{{ email }}"></p>
 
-		<p><label>New Password Again</label>
-		<br /><input type="password" name="new-password-again"></p>
-	
-		<p><input type="submit" value="Save"> or <a href="{{ referrer }}">Cancel</a>.</p>
-	</form>
+        <p>&nbsp;</p>
+
+        <h3>Change Password</h3>
+
+        <input type="hidden" name="_method" value="PUT" id="_method" />
+        <input type="hidden" name="uid" value="{{ uid }}" />
+        <input type="hidden" name="username" value="{{ username }}" />
+
+        <p><label>Current Password</label>
+        <br /><input type="password" name="password"></p>
+
+        <p><label>New Password</label>
+        <br /><input type="password" name="new-password"></p>
+
+        <p><label>New Password Again</label>
+        <br /><input type="password" name="new-password-again"></p>
+
+        <p><input type="submit" value="Save"> or <a href="{{ referrer }}">Cancel</a>.</p>
+    </form>
 {% endblock %}

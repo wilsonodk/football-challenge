@@ -1,25 +1,25 @@
 {% extends "base.html.twig" %}
 
 {% block head %}
-	{{ parent() }}
+    {{ parent() }}
 {% endblock %}
 
 {% block content %}
-	{{ parent() }}
-	
-	<form method="post" action="{{ base_path }}/login" class="account-form">
-		<p>
-			<label>Username</label>
-			<br /><input type="text" name="username">
-		</p>
-		<p>
-			<label>Password</label>
-			<br /><input type="password" name="password">
-		</p>
-		<input type="hidden" name="referrer" value="{{ referrer }}" />
-		<p><input type="submit" value="Login"></p>
-	</form>
-	<script type="text/javascript">
-	$('[name="username"]').focus();
-	</script>
+    {{ parent() }}
+
+    <form method="post" action="{{ base_path }}/login" class="account-form">
+        <p>
+            <label>Username</label>
+            <br /><input type="text" name="username">
+        </p>
+        <p>
+            <label>Password</label>
+            <br /><input type="password" name="password">
+        </p>
+        <input type="hidden" name="referrer" value="{{ referrer }}" />
+        <p><input type="submit" value="Login"></p>
+    </form>
+    <script type="text/javascript">
+    $('[name="username"]').focus();
+    </script>
 {% endblock %}
