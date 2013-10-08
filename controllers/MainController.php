@@ -170,6 +170,7 @@ class MainController extends AppController
                     if ($response = $db->useQuery('new-submission')) {
                         if ($db->useQuery('update-user-submission')) {
                             flash('message', 'Your submission has been saved.');
+                            $log->log('message', sprintf('Submission: %s', $db->getQuery('update-user-submission')));
                         }
                         else {
                             $log->log('error', 'Error updating user submission check for user "' . $user['name'] . '"');
@@ -186,7 +187,15 @@ class MainController extends AppController
                 elseif ($result->num_rows == 1) {
                     // Update
                     if ($response = $db->useQuery('update-submission')) {
-                        flash('message', 'Your submission has been updated.');
+                        if ($db->useQuery('update-user-submission')) {
+                            flash('message', 'Your submission has been updated.');
+                            $log->log('message', sprintf('Submission: %s', $db->getQuery('update-user-submission')));
+                        }
+                        else {
+                            $log->log('error', sprintf('Error with updating submission check for user "%s"', $user['name']), $db->error);
+                            flash('error:update user', 'There was an error while processing your submission.');
+                            flash('error:try again', 'Please try again later.');
+                        }
                     }
                     else {
                         $log->log('error', 'Error with update submission.', $db->error);
