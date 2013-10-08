@@ -7,7 +7,7 @@ RELEASE="release-$BUILD_VERSION.tar.gz"
 echo $BUILD_VERSION > BUILD_VERSION.txt
 
 echo "Create tarball"
-tar cvfz $RELEASE --exclude=build-release.sh --exclude=football-challenge.sql --exclude=junkies-out.sql --exclude=deploy-release.sh --exclude=.DS_Store .
+tar cvfz $RELEASE --exclude=build-release.sh --exclude=football-challenge.sql --exclude=junkies-out.sql --exclude=deploy-release.sh --exclude=.DS_Store --exclude=.git --exclude=.gitignore --exclude=.editorconfig .
 echo "Finished..."
 
 echo " "
