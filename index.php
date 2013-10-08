@@ -9,11 +9,10 @@ define('TEMPLATE_DIR',  SITE_ROOT . '/views/templates');
 define('SITE_NAME',     'Football Challenge');
 define('WODK_LOG',      SITE_ROOT . '/web_app.log');
 define('WODK_BASE_URI', '/junkies/');
-define('FORBIDDEN',     403); // Use this with halt() to send a 403
+define('FORBIDDEN',     403); // Use this with halt() to send a 403 Forbidden
 
 // Football Challenge constants
 define('FC_LOG',            SITE_ROOT . '/football-challenge.log');
-define('FC_BASE_URI',       '/junkies/');
 define('FC_COOKIE',         'football-challenge');
 define('FC_YEAR',           2013);
 define('FC_NUM_WEEKS',      15);
@@ -184,9 +183,9 @@ function before() {
     // Load flash
     get_flash_messages(flash_now());
 
-    //
-    // Other application tasks
-    //
+    /*
+     * Other application tasks
+     */
 
     // Footer
     $db = option('db');
@@ -206,6 +205,7 @@ function before_exit($exit) {
     $db = option('db');
     $db->close();
 }
+
 // Start app
 run();
 

@@ -67,7 +67,7 @@ class AppController
 
     static function getReferrer() {
         if (isset($_SERVER['HTTP_REFERER'])) {
-            $needle = 'http://' . $_SERVER['HTTP_HOST'] . FC_BASE_URI;
+            $needle = 'http://' . $_SERVER['HTTP_HOST'] . WODK_BASE_URI;
             $replace = '/';
             $haystack = $_SERVER['HTTP_REFERER'];
             $referrer = str_replace($needle, $replace, $haystack);
