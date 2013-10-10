@@ -144,26 +144,72 @@ class AdminController extends AppController
     }
 
     static function send_reminders() {
-        $rn    = "\r\n";
-        $db    = option('db');
-        $log   = option('log');
-        $week  = option('challenge_week');
-        $query = 'SELECT username, email FROM {{users}} WHERE submission = 0 AND reminder = 1 AND email != ""';
-        $url   = sprintf('http://%s%sweek/%s', $_SERVER['HTTP_HOST'], WODK_BASE_URI, $week);
-        $acct  = sprintf('http://%s%s/my-account', $_SERVER['HTTP_HOST'], WODK_BASE_URI);
+        $db   = option('db');
+        $log  = option('log');
+
+        $now  = time();
+        $day  = (60 * 24);
+        $week = option('challenge_week');
+
+        if ($result = $db->qry('SELECT closetime, reminder_sent FROM {{challenges}} WHERE year = %s AND week = %s LIMIT 1;', FC_YEAR, $week)) {
+            while ($obj = $result->fetch_object()) {
+                if ($obj->reminder_sent == 0 || $now > ($obj->closetime - $day)) {
+                    // No reminder has been sent and it's within 24 hours of the closetime
+                    self::send_emails($week);
+                }
+            }
+        }
+        else {
+            $log->log('error', 'Error getting close time for challenge.', $db->error);
+        }
+    }
+
+    static function send_emails($week) {
+        $db   = option('db');
+        $log  = option('log');
+
+        $rn   = "\r\n";
+        $base  = sprintf('http://%s%s', $_SERVER['HTTP_HOST'], WODK_BASE_URI);
+        $url   = sprintf('http://%sweek/%s', $base, $week);
+        $acct  = sprintf('http://%smy-account', $base);
         $phpv  = phpversion();
         $appv  = option('app_version');
+        $commissioners = array();
 
-        if ($result = $db->qry($query)) {
+        // Get commissioners
+        if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE permissions = 2')) {
+            while ($obj = $result->fetch_object()) {
+                $commissioners[] = sprintf('%s <%s>', $obj->username, $obj->email);
+            }
+
+            $commissioners = implode(', ', $commissioners);
+        }
+        else {
+            $log->log('error', 'Error getting all the commissioners.', $db->error);
+        }
+
+        // Send the email to users without a submission, that want reminders and have an email
+        if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE submission = 0 AND reminder = 1 AND email != ""')) {
             while ($obj = $result->fetch_object()) {
                 $to = sprintf('%s <%s>', $obj->username, $obj->email);
                 $subject = sprintf('Junkies Reminder Week %s', $week);
                 $message = "{$obj->username}{$rn}{$rn}Time is running out to enter your picks!{$rn}{$rn}{$url}{$rn}{$rn}To change your email reminder settings, go to...{$rn}{$acct}";
-                // TODO: Get commissioner emails for from, reply-to;
-                $headers = "From: WISEASS <wilson@odk.com>{$rn}Reply-To: WISEASS <wilson@odk.com>{$rn}X-Mailer: Football Challenge/{$appv} PHP/{$phpv}";
-
-                mail($to, $subject, $message, $headers);
+                $headers = "From: {$commissioners}{$rn}Reply-To: {$commissioners}{$rn}X-Mailer: Football Challenge/{$appv} PHP/{$phpv}";
+                if (option('env') === 'prod') {
+                    mail($to, $subject, $message, $headers);
+                }
+                else {
+                    echo "$to, $subject, $message, $headers";
+                }
             }
+
+            // We've sent our reminder, let's update the challenge
+            if (! $db->qry('UPDATE {{challenges}} SET reminder_sent = 1 WHERE year = %s AND week = %s', FC_YEAR, $week)) {
+                $log->log('error', 'Error updating the challenges.', $db->error);
+            }
+        }
+        else {
+            $log->log('error', 'Error getting all the users to email.', $db->error);
         }
     }
 }
