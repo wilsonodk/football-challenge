@@ -17,6 +17,7 @@ define('FC_COOKIE',         'football-challenge');
 define('FC_YEAR',           2013);
 define('FC_NUM_WEEKS',      15);
 define('FC_NUM_CHALLENGES', 10);
+
 // How much to truncate the Messages when a new challenge is created.
 // 0 - No messages truncated
 // 1 - Messages from last week (and older) are truncated
@@ -91,8 +92,7 @@ function configure() {
     option('log', $log);
 
     // Setup environment
-    $localhost = preg_match('/^localhost(\:\d+)?/', $_SERVER['HTTP_HOST']);
-    $env =  $localhost ? ENV_DEVELOPMENT : ENV_PRODUCTION;
+    $env = trim(file_get_contents('ENVIRONMENT.txt')) === 'prod' ? ENV_PRODUCTION : ENV_DEVELOPMENT;
     option('env', $env);
     option('base_uri', WODK_BASE_URI);
     option('site_name', SITE_NAME);

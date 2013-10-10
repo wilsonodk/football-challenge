@@ -59,10 +59,11 @@ class UserController extends AppController
         $user = option('user_info');
 
         if ($user['uid'] && $user['name'] && $user['perms']) {
-            if ($result = $db->qry('SELECT email FROM {{users}} WHERE uid = %s AND username = "%s" AND permissions = %s', $db->escape_string($user['uid']), $db->escape_string($user['name']), $db->escape_string($user['perms']))) {
+            if ($result = $db->qry('SELECT email, reminder FROM {{users}} WHERE uid = %s AND username = "%s" AND permissions = %s', $db->escape_string($user['uid']), $db->escape_string($user['name']), $db->escape_string($user['perms']))) {
                 if ($result->num_rows === 1) {
                     while ($obj = $result->fetch_object()) {
-                        $user['email'] = $obj->email;
+                        $user['email']    = $obj->email;
+                        $user['reminder'] = $obj->reminder;
                     }
                 }
                 else {
@@ -78,6 +79,7 @@ class UserController extends AppController
                 'uid'       => $user['uid'],
                 'username'  => $user['name'],
                 'email'     => $user['email'],
+                'reminder'  => $user['reminder'],
             ));
         }
         else {
@@ -89,19 +91,22 @@ class UserController extends AppController
     }
 
     static function edit_account() {
-        $db            = option('db');
-        $log           = option('log');
-        $uid           = get_post('uid');
-        $username      = get_post('username');
-        $email         = get_post('email');
-        $current_email = get_post('current_email');
-        $password      = array(
+        $db               = option('db');
+        $log              = option('log');
+        $uid              = get_post('uid');
+        $username         = get_post('username');
+        $email            = get_post('email');
+        $current_email    = get_post('current_email');
+        $reminder         = get_post('reminder') === 'yes' ? 1 : 0;
+        $current_reminder = (int) get_post('current_reminder');
+        $password         = array(
             'old'   => get_post('password'),
             'new'   => get_post('new-password'),
             'again' => get_post('new-password-again'),
         );
-        $pw_query      = FALSE;
-        $email_query   = $email === $current_email ? FALSE : TRUE;
+        $pw_query         = FALSE;
+        $email_query      = $email === $current_email ? FALSE : TRUE;
+        $reminder_query   = $reminder === $current_reminder ? FALSE : TRUE;
 
         $db->setQuery(
             'validate',
@@ -117,6 +122,13 @@ class UserController extends AppController
             $db->escape_string($uid),
             $db->escape_string($username),
             $db->escape_string($current_email)
+        )
+        ->setQuery(
+            'reminder',
+            'UPDATE {{users}} SET reminder = %s WHERE uid = %s AND username = "%s"',
+            $db->escape_string($reminder),
+            $db->escape_string($uid),
+            $db->escape_string($username)
         );
 
         // Do we want to change our password?
@@ -138,7 +150,7 @@ class UserController extends AppController
                             }
                             else {
                                 $log->log('warning', 'Password mismatch for user `' . $username . '` when updating password.');
-                                flash('error:password mismatch', "Your new password doesn't match, please try again.");
+                                flash('error:password mismatch', 'Your new password doesn\'t match, please try again.');
                                 redirect_to('/my-account');
                             }
                         }
@@ -155,47 +167,73 @@ class UserController extends AppController
                     flash('error:try again', 'Please try again later.');
                 }
                 else {
+                    $log->log('error', 'Error validating email.', $db->error);
                     flash('error:validate', 'There was an error when trying to update your password.');
                     flash('error:try again', 'Please try again later.');
                 }
             }
             else {
                 $log->log('error', 'Database connection issue with validate query in UserController.');
-                flash('error:validate query', "There was an error with updating your password. db");
-                flash('error:try again', "Please try again later.");
+                flash('error:validate query', 'There was an error with updating your password. db');
+                flash('error:try again', 'Please try again later.');
             }
         }
 
         // Now execute our queries
+        if ($reminder_query) {
+            if ($db->useQuery('reminder')) {
+                if ($db->affected_rows === 1) {
+                    flash('message:reminder updated', 'Your email reminder settings have been updated.');
+                    $log->log('message', sprintf('User %s updated their email reminder settings', $username));
+                }
+                elseif ($db->affected_rows > 1) {
+                    flash('error:reminder too many', 'There was an issue while updating your email reminder settings.');
+                    $log->log('error', sprintf('Issue with email reminder query were updated on last query: %s', $db->getQuery('reminder')), $db->error);
+                    redirect_to('/');
+                }
+            }
+            else {
+                flash('error:reminder generic', 'There was an error updating your email reminder settings.');
+                $log->log('error', sprintf('Error with reminder query: %s', $db->getQuery('reminder')), $db->error);
+                redirect_to('/');
+            }
+        }
+
         if ($email_query) {
             if ($db->useQuery('email')) {
                 if ($db->affected_rows === 1) {
-                    flash('message:email updated', "Your email has been updated.");
+                    flash('message:email updated', 'Your email has been updated.');
+                    $log->log('message', sprintf('User %s updated their email.', $username));
                 }
                 elseif ($db->affected_rows > 1) {
-                    // TODO: Log issue with updating too many rows for email
-
-                    flash('error:update email account', "There was an issue with updating the email on your account.");
+                    flash('error:update email account', 'There was an issue with updating the email on your account.');
+                    $log->log('error', sprintf('Too many rows were updated on last query: %s', $db->getQuery('email')));
                     redirect_to('/');
                 }
+            }
+            else {
+                flash('error:update email generic', 'There was an error updating your email.');
+                $log->log('error', sprintf('Error with reminder query: %s', $db->getQuery('reminder')));
+                redirect_to('/');
             }
         }
 
         if ($pw_query) {
             if ($db->useQuery('password')) {
                 if ($db->affected_rows === 1) {
-                    flash('message:password updated', "Your password has been updated.");
+                    flash('message:password updated', 'Your password has been updated.');
+                    $log->log('message', sprintf('User %s updated their password.', $username));
                 }
                 elseif ($db->affected_rows > 1) {
-                    $log->log('error', 'Too many rows were updated with password change.');
-                    flash('error:update password', "There was an issue with updating the password on your account.");
+                    flash('error:update password', 'There was an issue with updating the password on your account.');
+                    $log->log('error', sprintf('Too many rows were updated with password change. %s', $db->getQuery('password')));
                     redirect_to('/');
                 }
             }
             else {
+                flash('error:update account', 'There was a problem updating your account.');
+                flash('error:try again', 'Please try again later.');
                 $log->log('error', 'Password query did not work.', $db->getQuery('password'));
-                flash('error:update account', "There was a problem updating your account.");
-                flash('error:try again', "Please try again later.");
                 redirect_to('/');
             }
         }

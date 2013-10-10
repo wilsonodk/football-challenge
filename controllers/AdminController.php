@@ -142,6 +142,30 @@ class AdminController extends AppController
         }
         redirect_to(self::getReferrer());
     }
+
+    static function send_reminders() {
+        $rn    = "\r\n";
+        $db    = option('db');
+        $log   = option('log');
+        $week  = option('challenge_week');
+        $query = 'SELECT username, email FROM {{users}} WHERE reminder = 1';
+        $url   = sprintf('http://%s%sweek/%s', $_SERVER['HTTP_HOST'], WODK_BASE_URI, $week);
+        $acct  = sprintf('http://%s%s/my-account', $_SERVER['HTTP_HOST'], WODK_BASE_URI);
+        $phpv  = phpversion();
+        $appv  = option('app_version');
+
+        if ($result = $db->qry($query)) {
+            while ($obj = $result->fetch_object()) {
+                $to = sprintf('%s <%s>', $obj->username, $obj->email);
+                $subject = sprintf('Junkies Reminder Week %s', $week);
+                $message = "{$obj->username}{$rn}{$rn}Time is running out to enter your picks!{$rn}{$rn}{$url}{$rn}{$rn}To change your email reminder settings, go to...{$rn}{$acct}";
+                // TODO: Get commissioner emails for from, reply-to;
+                $headers = "From: WISEASS <wilson@odk.com>{$rn}Reply-To: WISEASS <wilson@odk.com>{$rn}X-Mailer: Football Challenge/{$appv} PHP/{$phpv}";
+
+                mail($to, $subject, $message, $headers);
+            }
+        }
+    }
 }
 
 ?>
