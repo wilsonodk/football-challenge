@@ -1,8 +1,18 @@
 /*jslint nomen: true */
 /*globals window, document, jQuery, _, Backbone*/
+
 (function (window, document, $, _, Backbone) {
     'use strict';
-    var Message, MessageView, MessageList, MainReplyView, AppView, messages, messenger;
+
+    var Message,
+        MessageView,
+        MessageList,
+        MainReplyView,
+        AppView,
+        messages,
+        messenger,
+        foot,
+        win = $(window);
 
     Message = Backbone.Model.extend({
         initialize: function () {
@@ -123,6 +133,8 @@
         initialize: function () {
             this.userInfo = this.getUserInfo();
 
+            win.on('resize', _.bind(this.doResize, this));
+
             messages.on('reset', this.addAll, this);
             messages.on('sync', this.resync, this);
 
@@ -133,21 +145,26 @@
 
             $('#all-messages').prepend(view.render().el);
         },
-        addAll: function () {
+        addAll: function (models) {
             // Add controls
             var controls = new MainReplyView({model: {}});
 
-            $('#all-messages').empty();
+            if (models.length > 0) {
+                $('#message-first').hide();
+            }
+
             this.$el.append(controls.render().el);
 
             // Add messages
             messages.each(this.addOne);
         },
         resync: function (model, collection) {
+            $('#all-messages').empty();
+
             messages.fetch();
         },
         getUserInfo: function () {
-            var obj  = {
+            var obj = {
                     name: false,
                     active: false
                 },
@@ -161,14 +178,39 @@
             }
 
             return obj;
+        },
+        doResize: function () {
+            var vph  = win.height() - foot.height() - Math.floor($('#messenger-input').height()/2),
+                mgh  = parseInt(this.$el.css('top')) + this.$el.height(),
+                diff = 0;
+
+            if (vph < mgh) {
+                diff = (mgh - vph);
+                this.$el.height(this.$el.height() - diff);
+            }
+            else {
+                //this.$el.height(this.$el.height() + diff);
+            }
+        },
+        remove: function () {
+            win.off('resize');
         }
     });
 
     // Run
     $(function () {
+        foot = $('#footer');
+
+        _.extend(window, Backbone.Events);
+        window.onresize = function () {
+            window.trigger('resize');
+        };
+
         messages  = new MessageList();
         messenger = new AppView({el: $('#messenger')});
     });
+
+
 
     String.prototype.tmpl = function (obj) {
         return this.replace(/\{(\w+)\}/g, function (full, match) {
@@ -177,7 +219,8 @@
     };
 
     Date.prototype.getOrdinal = function () {
-        var date = this.getDate(), ords = ['th', 'st', 'nd', 'rd'];
+        var date = this.getDate(),
+            ords = ['th', 'st', 'nd', 'rd'];
 
         return ords[(date - 20) % 10] || ords[date] || ords[0];
     };
