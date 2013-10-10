@@ -148,7 +148,7 @@ class AdminController extends AppController
         $db    = option('db');
         $log   = option('log');
         $week  = option('challenge_week');
-        $query = 'SELECT username, email FROM {{users}} WHERE reminder = 1';
+        $query = 'SELECT username, email FROM {{users}} WHERE submission = 0 AND reminder = 1 AND email != ""';
         $url   = sprintf('http://%s%sweek/%s', $_SERVER['HTTP_HOST'], WODK_BASE_URI, $week);
         $acct  = sprintf('http://%s%s/my-account', $_SERVER['HTTP_HOST'], WODK_BASE_URI);
         $phpv  = phpversion();
