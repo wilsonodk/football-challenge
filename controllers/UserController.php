@@ -150,7 +150,7 @@ class UserController extends AppController
                             }
                             else {
                                 $log->log('warning', 'Password mismatch for user `' . $username . '` when updating password.');
-                                flash('error:password mismatch', 'Your new password doesn\'t match, please try again.');
+                                flash('error:password mismatch', 'Your new password does not match, please try again.');
                                 redirect_to('/my-account');
                             }
                         }
