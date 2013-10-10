@@ -14,10 +14,13 @@
         <input type="hidden" name="uid" value="{{ uid }}" />
         <input type="hidden" name="username" value="{{ username }}" />
         <input type="hidden" name="current_email" value="{{ email }}" />
+        <input type="hidden" name="current_reminder" value="{{ reminder }}" />
 
-        <h3>Update Email</h3>
+        <h3>Email Settings</h3>
 
-        <p><label>Email</label>
+        <p><input type="checkbox" name="reminder" value="yes" {% if reminder == 1 %} checked="true" {% endif %}/> <label>Receive Reminders</label></p>
+
+        <p><label>Update Email</label>
         <br /><input type="text" name="email" value="{{ email }}"></p>
 
         <p>&nbsp;</p>

@@ -32,6 +32,7 @@ dispatch('/picks-week/:num', 'MainController::picks_week');
  * GET     /commissioner                    AdminController::home
  * GET     /commissioner/logs               AdminController::logs
  * GET     /commissioner/standings          AdminController::standings
+ * GET     /commissioner/reminders          AdminController::send_reminders
  * GET     /commissioner/challenge          AdminChallengeController::challenge
  * POST    /commissioner/challenge          AdminChallengeController::challenge_add
  * GET     /commissioner/challenge/edit     AdminChallengeController::challenge_show_edit
@@ -46,10 +47,12 @@ dispatch('/picks-week/:num', 'MainController::picks_week');
  * PUT     /commissioner/player/:id/edit    AdminPlayerController::player_do_edit
  * GET     /commissioner/player/:id/delete  AdminPlayerController::player_show_delete
  * DELETE  /commissioner/player/:id/delete  AdminPlayerController::player_do_delete
+
  */
 dispatch('/commissioner',           'AdminController::home');
 dispatch('/commissioner/logs',      'AdminController::logs');
 dispatch('/commissioner/standings', 'AdminController::standings');
+dispatch('/commissioner/reminders', 'AdminController::send_reminders');
 // Challenge
 dispatch('/commissioner/challenge',             'AdminChallengeController::challenge');
 dispatch_post('/commissioner/challenge',        'AdminChallengeController::challenge_add');

@@ -233,10 +233,10 @@
                 {% set wait_count = wait_count + 1 %}
             {% endif %}
             <tr>
-                <td width="25%" class="{{ away_class|one_space }}">{{ _self.get_icon(challenge.away_sid, challenge.winner_sid, base_path) }} {{ challenge.away_school }}</td>
-                <td width="25%" class="conference {{ away_class|one_space }}">{{ challenge.away_conf }}</td>
-                <td width="25%" class="{{ home_class|one_space }}">{{ _self.get_icon(challenge.home_sid, challenge.winner_sid, base_path) }} {{ challenge.home_school }}</td>
-                <td width="25%" class="conference {{ home_class|one_space }}">{{ challenge.home_conf }}</td>
+                <td width="35%" class="{{ away_class|one_space }}">{{ _self.get_icon(challenge.away_sid, challenge.winner_sid, base_path) }} {{ challenge.away_school }}</td>
+                <td width="15%" class="conference {{ away_class|one_space }}">{{ challenge.away_conf }}</td>
+                <td width="35%" class="{{ home_class|one_space }}">{{ _self.get_icon(challenge.home_sid, challenge.winner_sid, base_path) }} {{ challenge.home_school }}</td>
+                <td width="15%" class="conference {{ home_class|one_space }}">{{ challenge.home_conf }}</td>
             </tr>
         {% endfor %}
     </table>

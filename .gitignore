@@ -5,3 +5,5 @@ nogit
 *.log
 *.tar.gz
 BUILD_VERSION.txt
+update-script.sh
+ENVIRONMENT.txt
