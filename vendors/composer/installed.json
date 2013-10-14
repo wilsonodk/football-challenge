@@ -1,0 +1,165 @@
+[
+    {
+        "name": "Wodk/Autoloader",
+        "version": "v1.0.2",
+        "version_normalized": "1.0.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/wilsonodk/Autoloader",
+            "reference": "e0b17de8d362d237196552ea39f3f26d6b5a76b1"
+        },
+        "time": "2013-10-14 18:40:44",
+        "type": "library",
+        "installation-source": "source",
+        "authors": [
+            {
+                "name": "Wilson Wise",
+                "email": "wilson@odk.com",
+                "homepage": "http://wilson.odk.com",
+                "role": "Developer"
+            }
+        ],
+        "keywords": [
+            "autoloader"
+        ],
+        "support": {
+            "email": "wilson@odk.com",
+            "issues": "https://github.com/wilsonodk/Autoloader/issues"
+        }
+    },
+    {
+        "name": "Wodk/Logger",
+        "version": "v1.1.1",
+        "version_normalized": "1.1.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/wilsonodk/Logger",
+            "reference": "0e6dbc77f4128f80a6f3d15683020e6b4490ae9c"
+        },
+        "time": "2013-10-14 18:54:56",
+        "type": "library",
+        "installation-source": "source",
+        "authors": [
+            {
+                "name": "Wilson Wise",
+                "email": "wilson@odk.com",
+                "homepage": "http://wilson.odk.com",
+                "role": "Developer"
+            }
+        ],
+        "keywords": [
+            "autoloader"
+        ],
+        "support": {
+            "email": "wilson@odk.com",
+            "issues": "https://github.com/wilsonodk/Logger/issues"
+        }
+    },
+    {
+        "name": "Wodk/TwigExtensions",
+        "version": "v1.0.2",
+        "version_normalized": "1.0.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/wilsonodk/TwigExtensions",
+            "reference": "3a7b7256795854f0a599640b62d9fb1196fc4e1d"
+        },
+        "time": "2013-10-14 19:03:40",
+        "type": "library",
+        "installation-source": "source",
+        "authors": [
+            {
+                "name": "Wilson Wise",
+                "email": "wilson@odk.com",
+                "homepage": "http://wilson.odk.com",
+                "role": "Developer"
+            }
+        ],
+        "keywords": [
+            "autoloader"
+        ],
+        "support": {
+            "email": "wilson@odk.com",
+            "issues": "https://github.com/wilsonodk/TwigExtensions/issues"
+        }
+    },
+    {
+        "name": "twig/twig",
+        "version": "v1.10.0",
+        "version_normalized": "1.10.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/fabpot/Twig.git",
+            "reference": "60e91ba6918170ada88c66501af85d7c10b94a13"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/fabpot/Twig/zipball/60e91ba6918170ada88c66501af85d7c10b94a13",
+            "reference": "60e91ba6918170ada88c66501af85d7c10b94a13",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2.4"
+        },
+        "time": "2012-09-28 20:11:39",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.10-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Twig_": "lib/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Armin Ronacher",
+                "email": "armin.ronacher@active-4.com"
+            }
+        ],
+        "description": "Twig, the flexible, fast, and secure template language for PHP",
+        "homepage": "http://twig.sensiolabs.org",
+        "keywords": [
+            "templating"
+        ]
+    },
+    {
+        "name": "Wodk/DB",
+        "version": "v1.1.1",
+        "version_normalized": "1.1.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/wilsonodk/DB",
+            "reference": "8c8f3dc489ba6ba78e30013fd2f1128483ae7b07"
+        },
+        "time": "2013-10-14 17:37:42",
+        "type": "library",
+        "installation-source": "source",
+        "authors": [
+            {
+                "name": "Wilson Wise",
+                "email": "wilson@odk.com",
+                "homepage": "http://wilson.odk.com",
+                "role": "Developer"
+            }
+        ],
+        "keywords": [
+            "autoloader"
+        ],
+        "support": {
+            "email": "wilson@odk.com",
+            "issues": "https://github.com/wilsonodk/DB/issues"
+        }
+    }
+]
