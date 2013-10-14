@@ -29,11 +29,10 @@ define('FC_MSGS_TRUNCATE', 1);
 require_once('vendors/limonade.php');
 
 // Get our templating engine Twig
-require_once('vendors/Twig/Autoloader.php');
-Twig_Autoloader::register();
+require_once('vendors/autoload.php');
 
 // Autoload our Wodk classes
-require_once('vendors/Wodk/Autoloader.php');
+require_once('vendors/Wodk/Autoloader/Autoloader.php');
 Wodk_Autoloader::register();
 
 // Autoload our controllers
