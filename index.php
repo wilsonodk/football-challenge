@@ -6,7 +6,7 @@ date_default_timezone_set('America/New_York');
 define('SITE_ROOT',     __DIR__);
 define('CACHE_DIR',     SITE_ROOT . '/views/cache');
 define('TEMPLATE_DIR',  SITE_ROOT . '/views/templates');
-define('SITE_NAME',     'Football Challenge');
+define('SITE_NAME',     'Junkies');
 define('WODK_LOG',      SITE_ROOT . '/web_app.log');
 define('WODK_BASE_URI', '/junkies/');
 define('FORBIDDEN',     403); // Use this with halt() to send a 403 Forbidden
