@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "58665fb4b95bedd278f7d26486b22016",
+    "hash": "8cd414e7d2b3a403e574c5882503dd1e",
     "packages": [
         {
             "name": "Wodk/Autoloader",
@@ -110,6 +110,34 @@
             "time": "2013-10-14 19:03:40"
         },
         {
+            "name": "sofadesign/limonade",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sofadesign/limonade.git",
+                "reference": "334fa42f8ed202cbbbd84a43e529666d4fc30e4e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sofadesign/limonade/zipball/334fa42f8ed202cbbbd84a43e529666d4fc30e4e",
+                "reference": "334fa42f8ed202cbbbd84a43e529666d4fc30e4e",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/limonade.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "a PHP micro-framework",
+            "homepage": "https://github.com/sofadesign/limonade",
+            "keywords": [
+                "microframework"
+            ],
+            "time": "2013-05-13 18:31:17"
+        },
+        {
             "name": "twig/twig",
             "version": "v1.10.0",
             "source": {
@@ -166,9 +194,9 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": [
-
-    ],
+    "stability-flags": {
+        "sofadesign/limonade": 20
+    },
     "platform": [
 
     ],

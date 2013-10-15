@@ -7,3 +7,5 @@ nogit
 BUILD_VERSION.txt
 update-script.sh
 ENVIRONMENT.txt
+vendor
+vendors

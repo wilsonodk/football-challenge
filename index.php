@@ -25,14 +25,12 @@ define('FC_NUM_CHALLENGES', 10);
 // ...
 define('FC_MSGS_TRUNCATE', 1);
 
-// Get the micro-framework Limonade
-require_once('vendors/limonade.php');
-
 // Get our templating engine Twig
-require_once('vendors/autoload.php');
+// Get the micro-framework Limonade
+require_once('vendor/autoload.php');
 
 // Autoload our Wodk classes
-require_once('vendors/Wodk/Autoloader/Autoloader.php');
+require_once('vendor/Wodk/Autoloader/Autoloader.php');
 Wodk_Autoloader::register();
 
 // Autoload our controllers
