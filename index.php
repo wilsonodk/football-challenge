@@ -6,7 +6,7 @@ date_default_timezone_set('America/New_York');
 define('SITE_ROOT',     __DIR__);
 define('CACHE_DIR',     SITE_ROOT . '/views/cache');
 define('TEMPLATE_DIR',  SITE_ROOT . '/views/templates');
-define('SITE_NAME',     'Football Challenge');
+define('SITE_NAME',     'Junkies');
 define('WODK_LOG',      SITE_ROOT . '/web_app.log');
 define('WODK_BASE_URI', '/junkies/');
 define('FORBIDDEN',     403); // Use this with halt() to send a 403 Forbidden
@@ -29,11 +29,10 @@ define('FC_MSGS_TRUNCATE', 1);
 require_once('vendors/limonade.php');
 
 // Get our templating engine Twig
-require_once('vendors/Twig/Autoloader.php');
-Twig_Autoloader::register();
+require_once('vendors/autoload.php');
 
 // Autoload our Wodk classes
-require_once('vendors/Wodk/Autoloader.php');
+require_once('vendors/Wodk/Autoloader/Autoloader.php');
 Wodk_Autoloader::register();
 
 // Autoload our controllers

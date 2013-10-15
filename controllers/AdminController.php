@@ -75,9 +75,16 @@ class AdminController extends AppController
          *  tally wins/losses
          * update the user
          */
+
+        // Get all users and create user object for each, resetting wins/losses/totals
         if ($result = $db->qry($get_users)){
             while ($obj = $result->fetch_object()) {
-                $users[$obj->username] = array('wins' => 0, 'losses' => 0, 'total' => 0, 'uid' => $obj->uid);
+                $users[$obj->username] = array(
+                    'wins'   => 0,
+                    'losses' => 0,
+                    'total'  => 0,
+                    'uid'    => $obj->uid
+                );
             }
         }
         else {
@@ -100,7 +107,7 @@ class AdminController extends AppController
                 flash('error:winners', 'Could not get winner\'s data.');
             }
 
-            // Get the users' submissions for this week
+            // Get the users' submissions for this $week
             foreach ($users as $user => $results) {
                 $key = sprintf('%s-%s-%s', $user, FC_YEAR, $week);
                 if ($user_result = $db->qry($get_subs, $key)) {
@@ -124,10 +131,9 @@ class AdminController extends AppController
                         }
                     }
 
-                    //
-                    $users[$user]['wins']   += $wins;
+                    $users[$user]['wins'] += $wins;
                     $users[$user]['losses'] += $losses;
-                    $users[$user]['total']  += ($wins + $losses);
+                    $users[$user]['total'] += ($wins + $losses);
                 }
                 else {
                     $log->log('error', 'Could not get user submission data.', $db->error);
@@ -169,6 +175,7 @@ class AdminController extends AppController
                     $missing = new StdClass;
                     $missing->cid = $key;
                     $missing->sid = 9999;
+
                     // Add it to their arr
                     $arr[] = $missing;
                 }
@@ -179,26 +186,77 @@ class AdminController extends AppController
     }
 
     static function send_reminders() {
-        $rn    = "\r\n";
-        $db    = option('db');
-        $log   = option('log');
-        $week  = option('challenge_week');
-        $query = 'SELECT username, email FROM {{users}} WHERE submission = 0 AND reminder = 1 AND email != ""';
-        $url   = sprintf('http://%s%sweek/%s', $_SERVER['HTTP_HOST'], WODK_BASE_URI, $week);
-        $acct  = sprintf('http://%s%s/my-account', $_SERVER['HTTP_HOST'], WODK_BASE_URI);
-        $phpv  = phpversion();
-        $appv  = option('app_version');
+        $db   = option('db');
+        $log  = option('log');
 
-        if ($result = $db->qry($query)) {
+        $now  = time();
+        $day  = (60 * 24);
+        $week = option('challenge_week');
+
+        if ($result = $db->qry('SELECT closetime, reminder_sent FROM {{challenges}} WHERE year = %s AND week = %s LIMIT 1;', FC_YEAR, $week)) {
             while ($obj = $result->fetch_object()) {
-                $to = sprintf('%s <%s>', $obj->username, $obj->email);
-                $subject = sprintf('Junkies Reminder Week %s', $week);
-                $message = "{$obj->username}{$rn}{$rn}Time is running out to enter your picks!{$rn}{$rn}{$url}{$rn}{$rn}To change your email reminder settings, go to...{$rn}{$acct}";
-                // TODO: Get commissioner emails for from, reply-to;
-                $headers = "From: WISEASS <wilson@odk.com>{$rn}Reply-To: WISEASS <wilson@odk.com>{$rn}X-Mailer: Football Challenge/{$appv} PHP/{$phpv}";
-
-                mail($to, $subject, $message, $headers);
+                if ($obj->reminder_sent == 0 || $now > ($obj->closetime - $day)) {
+                    // No reminder has been sent and it's within 24 hours of the closetime
+                    self::send_emails($week);
+                }
             }
+        }
+        else {
+            $log->log('error', 'Error getting close time for challenge.', $db->error);
+        }
+    }
+
+    static function send_emails($week) {
+        $db = option('db');
+        $log = option('log');
+
+        $rn = "\r\n";
+
+        $base = sprintf('http://%s%s', $_SERVER['HTTP_HOST'], WODK_BASE_URI);
+        $url  = sprintf('http://%sweek/%s', $base, $week);
+        $acct = sprintf('http://%smy-account', $base);
+
+        $phpv = phpversion();
+        $appv = option('app_version');
+
+        $commissioners = array();
+
+        $site_name = SITE_NAME;
+
+        // Get commissioners
+        if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE permissions = 2')) {
+            while ($obj = $result->fetch_object()) {
+                $commissioners[] = sprintf('%s <%s>', $obj->username, $obj->email);
+            }
+
+            $commissioners = implode(', ', $commissioners);
+
+            // Send the email to users without a submission, that want reminders and have an email
+            if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE submission = 0 AND reminder = 1 AND email != ""')) {
+                while ($obj = $result->fetch_object()) {
+                    $to      = "{$obj->username} <{$obj->email}>";
+                    $subject = "{$site_name} Reminder Week {$week}";
+                    $message = "{$obj->username}{$rn}{$rn}Time is running out to enter your picks!{$rn}{$rn}{$url}{$rn}{$rn}To change your email reminder settings, go to...{$rn}{$acct}";
+                    $headers = "From: {$commissioners}{$rn}Reply-To: {$commissioners}{$rn}X-Mailer: Football Challenge/{$appv} PHP/{$phpv}";
+                    if (option('env') === 'prod') {
+                        mail($to, $subject, $message, $headers);
+                    }
+                    else {
+                        echo "$to, $subject, $message, $headers";
+                    }
+                }
+
+                // We've sent our reminder, let's update the challenge
+                if (! $db->qry('UPDATE {{challenges}} SET reminder_sent = 1 WHERE year = %s AND week = %s', FC_YEAR, $week)) {
+                    $log->log('error', 'Error updating the challenges.', $db->error);
+                }
+            }
+            else {
+                $log->log('error', 'Error getting all the users to email.', $db->error);
+            }
+        }
+        else {
+            $log->log('error', 'Error getting all the commissioners.', $db->error);
         }
     }
 }
