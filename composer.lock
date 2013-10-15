@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "8cd414e7d2b3a403e574c5882503dd1e",
+    "hash": "6ad9024c39092ebdd568a69fd4b0302e",
     "packages": [
         {
             "name": "Wodk/Autoloader",
@@ -85,11 +85,11 @@
         },
         {
             "name": "Wodk/TwigExtensions",
-            "version": "v1.0.2",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wilsonodk/TwigExtensions",
-                "reference": "3a7b7256795854f0a599640b62d9fb1196fc4e1d"
+                "reference": "9665df8c347db7356c1fcbf3e334b35e3d42770a"
             },
             "type": "library",
             "authors": [
@@ -107,7 +107,7 @@
                 "email": "wilson@odk.com",
                 "issues": "https://github.com/wilsonodk/TwigExtensions/issues"
             },
-            "time": "2013-10-14 19:03:40"
+            "time": "2013-10-15 13:31:39"
         },
         {
             "name": "sofadesign/limonade",
