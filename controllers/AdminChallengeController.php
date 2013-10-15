@@ -28,7 +28,7 @@ class AdminChallengeController extends AdminController
             $db = option('db');
             $log = option('log');
             $current_week = $_POST['current-week'];
-            $insert = 'INSERT INTO {{challenges}} VALUES (NULL, "%s", %d, %d, 0, %d, %d, %d, %d, %d, %d)';
+            $insert = 'INSERT INTO {{challenges}} VALUES (NULL, "%s", %d, %d, 0, %d, %d, %d, %d, %d, %d, 0)';
             $user_challenges = array();
 
             list($challenges, $first_start) = self::process_challenges($_POST, $db, $log);
