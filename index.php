@@ -25,13 +25,10 @@ define('FC_NUM_CHALLENGES', 10);
 // ...
 define('FC_MSGS_TRUNCATE', 1);
 
+// Get the Wodk Library (DB, Logger and TwigExtensions)
 // Get our templating engine Twig
 // Get the micro-framework Limonade
 require_once('vendor/autoload.php');
-
-// Autoload our Wodk classes
-require_once('vendor/Wodk/Autoloader/Autoloader.php');
-Wodk_Autoloader::register();
 
 // Autoload our controllers
 require_once('controllers/AppController.php');

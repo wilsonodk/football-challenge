@@ -2,26 +2,11 @@
     "repositories": [
         {
             "type": "git",
-            "url": "https://github.com/wilsonodk/Autoloader"
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/wilsonodk/DB"
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/wilsonodk/Logger"
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/wilsonodk/TwigExtensions"
+            "url": "https://github.com/wilsonodk/wodk"
         }
     ],
     "require": {
-        "Wodk/Autoloader": "v1.0.2",
-        "Wodk/DB": "v1.1.1",
-        "Wodk/Logger": "v1.1.1",
-        "Wodk/TwigExtensions": "v1.1.0",
+        "Wodk/Wodk": "v1.0.0",
         "twig/twig": "v1.10.0",
         "sofadesign/limonade": "dev-master"
     }
