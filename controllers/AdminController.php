@@ -213,20 +213,22 @@ class AdminController extends AppController
         $rn = "\r\n";
 
         $base = sprintf('http://%s%s', $_SERVER['HTTP_HOST'], WODK_BASE_URI);
-        $url  = sprintf('http://%sweek/%s', $base, $week);
-        $acct = sprintf('http://%smy-account', $base);
+        $url  = sprintf('%sweek/%s', $base, $week);
+        $acct = sprintf('%smy-account', $base);
 
         $phpv = phpversion();
-        $appv = option('app_version');
+        $appv = trim(option('app_version'));
 
         $commissioners = array();
 
         $site_name = SITE_NAME;
 
+        $env = trim(option('env'));
+
         // Get commissioners
         if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE permissions = 2')) {
             while ($obj = $result->fetch_object()) {
-                $commissioners[] = sprintf('%s <%s>', $obj->username, $obj->email);
+                $commissioners[] = "{$obj->username} <{$obj->email}>";
             }
 
             $commissioners = implode(', ', $commissioners);
@@ -236,23 +238,26 @@ class AdminController extends AppController
                 while ($obj = $result->fetch_object()) {
                     $to      = "{$obj->username} <{$obj->email}>";
                     $subject = "{$site_name} Reminder Week {$week}";
-                    $message = "{$obj->username}{$rn}{$rn}Time is running out to enter your picks!{$rn}{$rn}{$url}{$rn}{$rn}To change your email reminder settings, go to...{$rn}{$acct}";
+                    $message = "{$obj->username},{$rn}Time is running out to enter your picks!{$rn}{$rn}{$url}{$rn}{$rn}{$rn}{$rn}To change your email reminder settings, go to...{$rn}{$acct}{$rn}";
                     $headers = "From: {$commissioners}{$rn}Reply-To: {$commissioners}{$rn}X-Mailer: Football Challenge/{$appv} PHP/{$phpv}";
-                    if (option('env') === 'prod') {
+                    if ($env === 'prod') {
+                        $log->log('message', sprintf('Reminder email sent to %s', htmlspecialchars($to)));
                         mail($to, $subject, $message, $headers);
                     }
                     else {
-                        echo "$to, $subject, $message, $headers";
+                        echo htmlspecialchars("{$headers}{$rn}{$rn}To: {$to}{$rn}{$rn}{$subject}{$rn}{$rn}$message{$rn}- - -{$rn}");
                     }
-                }
-
-                // We've sent our reminder, let's update the challenge
-                if (! $db->qry('UPDATE {{challenges}} SET reminder_sent = 1 WHERE year = %s AND week = %s', FC_YEAR, $week)) {
-                    $log->log('error', 'Error updating the challenges.', $db->error);
                 }
             }
             else {
                 $log->log('error', 'Error getting all the users to email.', $db->error);
+            }
+
+            if ($env === 'prod') {
+                // We've sent our reminder, let's update the challenge
+                if (! $db->qry('UPDATE {{challenges}} SET reminder_sent = 1 WHERE year = %s AND week = %s', FC_YEAR, $week)) {
+                    $log->log('error', 'Error updating the challenges.', $db->error);
+                }
             }
         }
         else {
