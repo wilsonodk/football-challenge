@@ -133,7 +133,7 @@
         initialize: function () {
             this.userInfo = this.getUserInfo();
 
-            win.on('resize', _.bind(this.doResize, this));
+            win.on('orientationchange', _.bind(this.toggleMessages, this));
 
             messages.on('reset', this.addAll, this);
             messages.on('sync', this.resync, this);
@@ -179,6 +179,28 @@
 
             return obj;
         },
+        toggleMessages: function () {
+            var diff = 66,
+                lght = 553,
+                smht = 353;
+
+            switch (window.orientation) {
+                case 90:
+                case -90:
+                    // Shorten
+                    this.$el.height(smht);
+                    $('#all-messages').height(smht - diff);
+                break;
+
+                case 0:
+                case 180:
+                default:
+                    // Lengthen
+                    this.$el.height(lght);
+                    $('#all-messages').height(lght - diff);
+                break;
+            }
+        },
         doResize: function () {
             var vph  = win.height() - foot.height() - Math.floor($('#messenger-input').height()/2),
                 mgh  = parseInt(this.$el.css('top')) + this.$el.height(),
@@ -201,16 +223,13 @@
     $(function () {
         foot = $('#footer');
 
-        _.extend(window, Backbone.Events);
-        window.onresize = function () {
-            window.trigger('resize');
-        };
-
         messages  = new MessageList();
         messenger = new AppView({el: $('#messenger')});
+
+        if (window.orientation !== 0) {
+            messenger.toggleMessages();
+        }
     });
-
-
 
     String.prototype.tmpl = function (obj) {
         return this.replace(/\{(\w+)\}/g, function (full, match) {
