@@ -5,7 +5,7 @@ nogit
 *.log
 *.tar.gz
 BUILD_VERSION.txt
-update-script.sh
+*.sh
 ENVIRONMENT.txt
 vendor
 vendors
