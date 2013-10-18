@@ -8,6 +8,8 @@
     var useTab = {{ week_num }};
     {% if challenge_active %}
     $(document).ready(loadWeeklyChallenge);
+    var close = {{ challenge_info[0].closetime }},
+        checkTimer = setInterval(checkTime, 1000);
     {% endif %}
     </script>
 {% endblock %}

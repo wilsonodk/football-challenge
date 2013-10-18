@@ -81,6 +81,9 @@ function get_flash_messages($all) {
 
 // Limonade
 function configure() {
+    // Reset the signature
+    option('signature', 'Wodk Football Challenge');
+
     // Setup logging
     $log = new Wodk_Logger(WODK_LOG);
     option('log', $log);

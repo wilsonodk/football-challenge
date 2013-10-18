@@ -190,14 +190,17 @@ class AdminController extends AppController
         $log  = option('log');
 
         $now  = time();
-        $day  = (60 * 24);
+        $day  = (60 * 60 * 24);
         $week = option('challenge_week');
 
         if ($result = $db->qry('SELECT closetime, reminder_sent FROM {{challenges}} WHERE year = %s AND week = %s LIMIT 1;', FC_YEAR, $week)) {
             while ($obj = $result->fetch_object()) {
-                if ($obj->reminder_sent == 0 || $now > ($obj->closetime - $day)) {
-                    // No reminder has been sent and it's within 24 hours of the closetime
+                if ($obj->reminder_sent == 0 && $now > ($obj->closetime - $day)) {
+                    // No reminder has been sent AND it's within 24 hours of the closetime
                     self::send_emails($week);
+                }
+                else {
+                    echo 'Not time for reminder';
                 }
             }
         }
