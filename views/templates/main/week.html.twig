@@ -8,8 +8,11 @@
     var useTab = {{ week_num }};
     {% if challenge_active %}
     $(document).ready(loadWeeklyChallenge);
+
     var close = {{ challenge_info[0].closetime }},
-        checkTimer = setInterval(checkTime, 1000);
+        checkTimer = setInterval(checkTime, 1000),
+        challenges = {{ challenge_info|json_encode()|raw }},
+        userData = {};
     {% endif %}
     </script>
 {% endblock %}
@@ -38,7 +41,7 @@
             <br /><span id="end-time" class="time"></span></p>
         {% if show_form %}
             <p id="form-action">
-                <input type="submit" value="Save"> or {{ macros.link("/", "Cancel", base_path) }}
+                <input id="save_btn" type="submit" value="Save"> or {{ macros.link("/", "Cancel", base_path) }}
             </p>
         </form>
         {% endif %}

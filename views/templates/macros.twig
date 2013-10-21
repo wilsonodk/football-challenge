@@ -88,7 +88,7 @@
         <tr class="gametime">
             <td colspan="4">{{ challenge.gametime_formatted }}</td>
         </tr>
-        <tr>
+        <tr class="challenge-{{ challenge.cid }}">
             {# Determine which was picked #}
             {% set is_away_picked = "" %}
             {% set is_home_picked = "" %}

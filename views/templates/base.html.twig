@@ -19,6 +19,7 @@
 <div id="wrapper">
     {# Header #}
     <div id="header">
+        {% set site_name %}{{ site_name }} Football Challenge{% endset %}
         <h1>{{ macros.link('/', site_name, base_path) }}</h1>
         <ul>
             <li id="home">{{ macros.link('/', 'Home', base_path) }}</li>
