@@ -27,13 +27,28 @@ function setWings() {
 function setNav() {
 	var root = "/" + (location.pathname.split('/')[1]) + "/",
 		path = location.pathname;
-	
+
 	if (typeof useTab !== 'undefined') {
 		$('li#week-' + useTab).addClass('selected');
 	}
 	else if (path.length === root.length) {
 		$('li#home').addClass('selected');
 	}
+}
+
+function onLastWeekResults(data, status, xhr) {
+    var output = '<table class="results"><tr><td class="wins">{wins}</td><td class="losses">{losses}</td></tr></table>',
+        users = data.users,
+        id;
+
+    for (var i = 0; i < users.length; i++) {
+        id = '#last-week-' + users[i].username;
+        $(id).html(output.replace('{wins}', users[i].wins).replace('{losses}', users[i].losses));
+    }
+}
+
+function getLastWeeksResults() {
+    $.getJSON('./last/week', onLastWeekResults);
 }
 
 function inspectObj(obj) {
@@ -94,7 +109,7 @@ function getEndTime(diff) {
 	}
 	// Format number of seconds
 	diff = Number(diff);
-	
+
 	return str.replace("{diff}", diff.format());
 }
 

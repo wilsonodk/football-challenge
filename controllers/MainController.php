@@ -315,6 +315,82 @@ class MainController extends AppController
         }
     }
 
+    static function last_week() {
+        $db = option('db');
+        $log = option('log');
+
+        $week = option('standings_week');
+
+        $output = array();
+
+        $twigish = new Wodk_TwigExtensions();
+
+        // Get last week's challenge
+        $output['challenge'] = array();
+        $last_challenge_query = 'SELECT c.cid, c.winner_sid AS winner_sid FROM {{challenges}} c, {{schools}} hs, {{schools}} vs WHERE c.home_sid = hs.sid AND c.away_sid = vs.sid AND c.year = %s AND c.week = %s';
+        if ($result = $db->qry($last_challenge_query, FC_YEAR, $week)) {
+            while ($obj = $result->fetch_object()) {
+                $output['challenge'][$obj->cid] = $obj;
+            }
+
+            // Get all the users and their challenge
+            $output['users'] = array();
+            $users_sub_query = 'SELECT {{users}}.username, {{submissions}}.subvalue FROM {{users}} LEFT JOIN {{submissions}} ON {{users}}.uid = {{submissions}}.uid WHERE {{submissions}}.year = %s AND {{submissions}}.week = %s';
+            if ($result = $db->qry($users_sub_query, FC_YEAR, $week)) {
+                while ($obj = $result->fetch_object()) {
+                    $output['users'][] = $obj;
+                }
+
+                // Setup to get each user's stats
+                foreach ($output['users'] as $user) {
+                    $temp = unserialize($user->subvalue);
+                    unset($user->subvalue);
+                    $user->challenge = $temp->challenges;
+                    $user->wins = 0;
+                    $user->losses = 0;
+                    $user->username = $twigish->convertStringToCssId($user->username);
+                }
+
+                // To get weekly stat
+                // 1. go through each challenge
+                // 2. compare against each user's pick
+                // 3. if successful, give a win
+                // 4. compare number of wins to number of challenges, diff is losses
+                foreach ($output['challenge'] as $cid => $challenge) {
+                    foreach ($output['users'] as $user) {
+                        foreach ($user->challenge as $user_pick) {
+                            if ($user_pick->cid == $cid) {
+                                if ($user_pick->sid === $challenge->winner_sid) {
+                                    $user->wins++;
+                                }
+                            }
+                        }
+
+                        if ($user->wins < FC_NUM_CHALLENGES) {
+                            $diff = FC_NUM_CHALLENGES - $user->wins;
+                            $user->losses = $diff;
+                        }
+                    }
+                }
+            } else {
+                // Log issue getting all users
+            }
+        }
+        else {
+            // Log issue getting last week's challenge
+        }
+
+        // Clean up output
+        unset($output['challenge']);
+        foreach ($output['users'] as $user) {
+            unset($user->challenge);
+        }
+
+        header('Content-type: application/json');
+
+        return json_encode($output);
+    }
+
     /**************************************************************************/
     /* HELPERS                                                                */
     /**************************************************************************/

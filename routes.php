@@ -24,6 +24,7 @@ dispatch_post('/week/:num',  'MainController::week_add');
 dispatch('/week/:num/:user', 'MainController::week_user');
 dispatch('/picks/:user',     'MainController::picks');
 dispatch('/picks-week/:num', 'MainController::picks_week');
+dispatch('/last/week',       'MainController::last_week');
 
 
 /*

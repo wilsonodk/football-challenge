@@ -6,7 +6,7 @@
         }
     ],
     "require": {
-        "Wodk/Wodk": "v1.0.0",
+        "Wodk/Wodk": "v1.1.0",
         "twig/twig": "v1.10.0",
         "sofadesign/limonade": "dev-master"
     }
