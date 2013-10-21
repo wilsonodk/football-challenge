@@ -4,6 +4,9 @@
 
 {% block head %}
     {{ parent() }}
+    <script type="application/javascript">
+    $(document).ready(getLastWeeksResults);
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -16,14 +19,15 @@
         <tr>
             <th>&nbsp;</th>
             <th align="left">Name</th>
-            <th>Correct</th>
-            <th>Wrong</th>
-            <th>Percentage</th>
+            <th class="padded">Correct</th>
+            <th class="padded">Missed</th>
+            <th class="padded">Percentage</th>
+            <th class="padded">Last Week</th>
         </tr>
     {% for item in standings %}
         <tr>
             <td align="right">{{ item.place }}</td>
-            <td>
+            <td class="padded">
                 {% if item.ready %}
                     {% set src %}{{ base_uri }}/public/fc-win-mark.png{% endset %}
                     {% set img_title %}Picks submitted{% endset %}
@@ -34,9 +38,10 @@
                 {{ macros.img(src, 10, 10, img_title) }}
                 <strong>{{ macros.link(item.path, item.name, base_path) }}</strong>
             </td>
-            <td align=center>{{ item.wins }}</td>
-            <td align=center>{{ item.loses }}</td>
+            <td align=center class="standing-win wins">{{ item.wins }}</td>
+            <td align=center class="standing-loss losses">{{ item.loses }}</td>
             <td align=center>{{ item.per }}%</td>
+            <td align=center id="last-week-{{ item.name|css_id }}"></td>
         </tr>
     {% endfor %}
     </table>

@@ -294,10 +294,43 @@ a:active {
 }
 
 .standings-table {
-    width: 350px;
+    width: auto;
     padding: 1px;
     border: 1px solid #999;
     margin-left: 20px;
+}
+
+.standings-table .standing-win {
+    border-left: 1px solid #ccc;
+}
+.standings-table .standing-loss {
+    border-right: 1px solid #ccc;
+}
+
+.standings-table .wins {
+    background-color: #efe;
+    font-weight: bold;
+    color: #090;
+}
+
+.standings-table .losses {
+    background-color: #fee;
+    font-weight: bold;
+    color: #900;
+}
+
+#content .standings-table table.results {
+    border-left: 1px solid #ccc;
+}
+#content .standings-table table.results tr {
+    border: 0;
+}
+#content .standings-table tr td:last-child {
+    padding: 0;
+}
+#content .standings-table table.results td {
+    width: 50%;
+    text-align: center;
 }
 
 .challenge-table {
@@ -332,6 +365,14 @@ a:active {
     width: 850px;
     padding: 1px;
     border: 1px solid #ccc;
+}
+
+table th.padded {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+table td.padded {
+    padding-right: 10px;
 }
 
 #player-status {

@@ -3,43 +3,8 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "758da3a464fa4fbe0f25d735bffdbb10",
+    "hash": "9ee870dbd566fff90d5b9c195da1a0a5",
     "packages": [
-        {
-            "name": "Wodk/Wodk",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/wilsonodk/wodk",
-                "reference": "7734ff07e8e9b2f5921a5a70c992fe2a4369a754"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Wodk_": "lib/"
-                }
-            },
-            "authors": [
-                {
-                    "name": "Wilson Wise",
-                    "email": "wilson@odk.com",
-                    "homepage": "http://wilson.odk.com",
-                    "role": "Developer"
-                }
-            ],
-            "keywords": [
-                "database",
-                "logger",
-                "mysqli",
-                "twig",
-                "wodk"
-            ],
-            "support": {
-                "email": "wilson@odk.com",
-                "issues": "https://github.com/wilsonodk/wodk/issues"
-            },
-            "time": "2013-10-16 15:54:50"
-        },
         {
             "name": "sofadesign/limonade",
             "version": "dev-master",
@@ -116,6 +81,41 @@
                 "templating"
             ],
             "time": "2012-09-28 20:11:39"
+        },
+        {
+            "name": "wodk/wodk",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wilsonodk/wodk",
+                "reference": "35bb0265e0d227eafc3fbf0dc8f33c6bd47d93e1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Wodk_": "lib/"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Wilson Wise",
+                    "email": "wilson@odk.com",
+                    "homepage": "http://wilson.odk.com",
+                    "role": "Developer"
+                }
+            ],
+            "keywords": [
+                "database",
+                "logger",
+                "mysqli",
+                "twig",
+                "wodk"
+            ],
+            "support": {
+                "email": "wilson@odk.com",
+                "issues": "https://github.com/wilsonodk/wodk/issues"
+            },
+            "time": "2013-10-21 17:04:14"
         }
     ],
     "packages-dev": [
