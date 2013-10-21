@@ -17,6 +17,8 @@
  * GET     /week/:num/:user  MainController::week_user
  * GET     /picks/:user      MainController::picks
  * GET     /picks-week/:num  MainController::picks_week
+ * GET     /last/week        MainController::last_week
+ * POST    /save/week        MainController::save_week
  */
 dispatch('/',                'MainController::home');
 dispatch('/week/:num',       'MainController::week');
@@ -25,6 +27,7 @@ dispatch('/week/:num/:user', 'MainController::week_user');
 dispatch('/picks/:user',     'MainController::picks');
 dispatch('/picks-week/:num', 'MainController::picks_week');
 dispatch('/last/week',       'MainController::last_week');
+dispatch_post('/save/week',  'MainController::save_week');
 
 
 /*

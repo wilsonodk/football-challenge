@@ -105,10 +105,12 @@ class MainController extends AppController
         return self::week_user($week_num, $user_info['name']);
     }
 
-    static function week_add($week_num) {
+    static function week_add($week_num, $do_redirect = TRUE) {
         $db  = option('db');
         $log = option('log');
+
         $user_info  = option('user_info');
+
         $submission = new StdClass;
 
         if ($user_info['use']) {
@@ -215,7 +217,13 @@ class MainController extends AppController
             flash('error:no user', 'Please login.');
         }
 
-        redirect_to(self::getReferrer());
+        if ($do_redirect) {
+            redirect_to(self::getReferrer());
+        }
+        else {
+            return TRUE;
+        }
+
     }
 
     static function picks($user) {
@@ -389,6 +397,17 @@ class MainController extends AppController
         header('Content-type: application/json');
 
         return json_encode($output);
+    }
+
+    static function save_week() {
+        $week = trim(option('challenge_week'));
+
+        $result = self::week_add($week, FALSE);
+
+        header('Content-type: application/json');
+
+        return json_encode($result);
+
     }
 
     /**************************************************************************/

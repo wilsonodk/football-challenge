@@ -2,19 +2,73 @@ $(document).ready(setNav);
 $(document).ready(setWings);
 $(window).resize(setWings);
 
-function loadCreateChallenge() {
-	// Form validation
+var allowSave = false;
 
+function loadCreateChallenge() {
+    // Form validation
 }
 
 function loadWeeklyChallenge() {
-	// Add event to toggle checked highlight
-	$(':radio').change(function(evt) {
-		var target  = $(evt.target).parent();
-		var type	= '.'+ target.attr('class').split(' ')[0];
-		target.parent().children('td').removeClass('user-pick');
-		$(type).addClass('user-pick');
+    // Add event to toggle checked highlight
+    $(':radio').change(function(evt) {
+        var target = $(evt.target).parent(),
+            type   = '.'+ target.attr('class').split(' ')[0];
+
+        // Update display
+        target.parent().children('td').removeClass('user-pick');
+        $(type).addClass('user-pick');
+
+        // Save
+        saveChallenge(target);
 	});
+
+    // Setup user object
+    setupChallenge(window.challenges);
+}
+
+function setupChallenge(challenges) {
+    var obj = {},
+        val = 0,
+        cid,
+        ele;
+
+    if (challenges && challenges.length && challenges.length > 0) {
+        allowSave = true;
+
+        for (var i = 0; i < challenges.length; i++) {
+            cid = 'challenge-' + challenges[i].cid;
+            ele = $('input[checked][name="'+ cid +'"]');
+            obj[cid] = ele.length ? ele.val() : 0;
+        }
+    }
+
+    window.userData = obj;
+}
+
+function saveChallenge(tar) {
+    if (allowSave) {
+        var picked = {};
+
+        picked.sid = tar.attr('class').split(' ')[0].split('-')[1],
+        picked.cid = tar.parent().attr('class');
+
+        // Picked stored in client object
+        window.userData[picked.cid] = picked.sid;
+
+        // Disable save button while autosaving
+        $('#save_btn').val('Saving...').attr('disabled', true);
+
+        $.post(
+            '../save/week',
+            window.userData,
+            onChallengeSaved,
+            'json'
+        );
+    }
+}
+
+function onChallengeSaved(data, status, xhr) {
+    $('#save_btn').val('Save').attr('disabled', false);
 }
 
 function setWings() {
