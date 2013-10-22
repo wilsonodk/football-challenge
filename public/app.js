@@ -47,7 +47,8 @@ function setupChallenge(challenges) {
 
 function saveChallenge(tar) {
     if (allowSave) {
-        var picked = {};
+        var picked = {},
+            url = basePath + '/save/week';
 
         picked.sid = tar.attr('class').split(' ')[0].split('-')[1],
         picked.cid = tar.parent().attr('class');
@@ -59,7 +60,7 @@ function saveChallenge(tar) {
         $('#save_btn').val('Saving...').attr('disabled', true);
 
         $.post(
-            '../save/week',
+            url,
             window.userData,
             onChallengeSaved,
             'json'
