@@ -37,22 +37,31 @@
 	margin: 5px;
 	padding: 3px 5px;
 	font-size: 12px;
+    line-height: 1.3em;
 	color: #000;
+
+    box-shadow: 0 1px 2px #999;
 }
 #messenger .message a,
-#messenger .message a:link, 
+#messenger .message a:link,
 #messenger .message a:visited {
-	color: #333;
+	color: #369;
 }
 #messenger .message a:hover,
 #messenger .message a:active {
 
+}
+#messenger .message a.user {
+    text-transform: uppercase;
 }
 
 #messenger .message .tools,
 #messenger .message .edit-area {
 	font-size: 11px;
 	color: #777;
+    margin-top: 4px;
+    padding-top: 3px;
+    border-top: 1px dashed #ccc;
 }
 
 #messenger .message .tools span {
@@ -64,19 +73,34 @@
 #messenger .message .tools a:visited,
 #messenger .message .edit-area a,
 #messenger .message .edit-area a:link,
-#messenger .message .edit-area a:visited{
+#messenger .message .edit-area a:visited {
 	color: #777;
 	font-weight: normal;
 	text-decoration: underline;
 }
 #messenger .message .tools a:hover,
-#messenger .message .edit-area a:hover{
+#messenger .message .edit-area a:hover {
 	text-decoration: none;
 }
 #messenger .message .tools a:active,
-#messenger .message .edit-area a:active{
+#messenger .message .edit-area a:active {
 	color: #900;
 	text-decoration: none;
+}
+
+#messenger .message .tools a.by,
+#messenger .message .tools a.by:link,
+#messenger .message .tools a.by:visited {
+    color: #777;
+    font-weight: bold;
+    text-decoration: none;
+}
+#messenger .message .tools a.by:hover {
+    color: #000;
+}
+#messenger .message .tools a.by:active {
+    color: #900;
+    text-decoration: none;
 }
 
 #messenger .input-area,
@@ -97,6 +121,6 @@
 
 #messenger .form-error,
 #messenger-input .form-error{
-	background-color: #f8dbdb;  
-	border-color: #e77776;  
+	background-color: #f8dbdb;
+	border-color: #e77776;
 }
