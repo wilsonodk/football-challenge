@@ -19,7 +19,7 @@
             this.set('id', this.get('mid'));
             this.set('posted', this.formatDate(this.get('timestamp')));
             this.set('message', this.htmlize(this.get('message')));
-            this.set('link_name', this.get('username').toLowerCase());
+            this.set('link_name', this.get('username') ? this.get('username').toLowerCase() : '');
         },
         formatDate: function message_doFormatDate(timestamp) {
             var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
