@@ -1,7 +1,7 @@
 /*jslint nomen: true */
 /*globals window, document, jQuery, _, Backbone*/
 
-(function (window, document, $, _, Backbone) {
+(function messagesApp(window, document, $, _, Backbone) {
     'use strict';
 
     var Message,
@@ -15,11 +15,13 @@
         win = $(window);
 
     Message = Backbone.Model.extend({
-        initialize: function () {
+        initialize: function message_doInit() {
             this.set('id', this.get('mid'));
             this.set('posted', this.formatDate(this.get('timestamp')));
+            this.set('message', this.htmlize(this.get('message')));
+            this.set('link_name', this.get('username').toLowerCase());
         },
-        formatDate: function (timestamp) {
+        formatDate: function message_doFormatDate(timestamp) {
             var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                 days   = ['Sun', 'Mon', 'Tue', 'Wed', 'Thr', 'Fri', 'Sat'],
                 date   = new Date(timestamp),
@@ -38,6 +40,29 @@
             // Day, Month Date, Hour:Minute meridiem
             // Mon, Oct 12, 2:24pm
             return '{day}., {month}. {date}{ordinal}, {hour}:{minute}{meridiem}'.tmpl(obj);
+        },
+        htmlize: function message_doHtmlize(input) {
+            var output = input,
+                base = window.basePath,
+                matchArr = [
+                    /(\n|\r)/g,
+                    new RegExp([ '(?:@)?', '(', window.siteUsers.join('|'), ')' ].join(''), 'gi'),
+                    /\*([\w\W]+)?\*/g,
+                    /\_([\w\W]+)?\_/g
+                ],
+                replaceArr = [
+                    '<br>',
+                    '<a href="' + base + '/picks/$1" class="user">@$1</a>',
+                    '<strong>$1</strong>',
+                    '<em>$1</em>'
+                ],
+                items = matchArr.length;
+
+            while (items--) {
+                output = output.replace(matchArr[items], replaceArr[items]);
+            }
+
+            return output;
         }
     });
 
@@ -50,7 +75,7 @@
             'click > .tools .reply-cancel': 'toggleReply',
             'click > .tools .reply-button': 'submitReply',
         },
-        render: function () {
+        render: function messageView_doRender() {
             var user = this.model.get('username');
 
             this.$el.html(this.template(this.model.toJSON()));
@@ -64,16 +89,16 @@
 
             return this;
         },
-        addReplyMessage: function (message) {
+        addReplyMessage: function messageView_doAddReplyMessage(message) {
             var view = new MessageView({model: new Message(message)});
 
             this.$el.find('> .replies').prepend(view.render().el);
         },
-        toggleReply: function (event) {
+        toggleReply: function messageView_doToggleReply(event) {
             this.tools.toggle();
             this.inputArea.toggle();
         },
-        submitReply: function () {
+        submitReply: function messageView_doSubmitReply() {
             var payload = {
                 pid: this.model.get('mid'),
                 message: this.replyText.val()
@@ -88,7 +113,7 @@
 
     MessageList = Backbone.Collection.extend({
         model: Message,
-        url: function () {
+        url: function messageList_doUrl() {
             var loc  = document.location,
                 base = window.basePath;
 
@@ -103,7 +128,7 @@
         events: {
             'click input': 'submitMessage'
         },
-        render: function() {
+        render: function mainReplyView_doRender() {
             this.$el.html(this.template({}));
 
             this.textarea = this.$('textarea');
@@ -116,7 +141,7 @@
 
             return this;
         },
-        submitMessage: function() {
+        submitMessage: function mainReplyView_doSubmitMessage() {
             var payload = {
                 pid: 'main',
                 message: this.textarea.val()
@@ -130,7 +155,7 @@
     });
 
     AppView = Backbone.View.extend({
-        initialize: function () {
+        initialize: function appView_doInit() {
             this.userInfo = this.getUserInfo();
 
             win.on('orientationchange', _.bind(this.toggleMessages, this));
@@ -140,12 +165,12 @@
 
             messages.fetch();
         },
-        addOne: function (message) {
+        addOne: function appView_doAddOne(message) {
             var view = new MessageView({model: message});
 
             $('#all-messages').prepend(view.render().el);
         },
-        addAll: function (models) {
+        addAll: function appView_doAddAll(models) {
             // Add controls
             var controls = new MainReplyView({model: {}});
 
@@ -158,12 +183,12 @@
             // Add messages
             messages.each(this.addOne);
         },
-        resync: function (model, collection) {
+        resync: function appView_doResync(model, collection) {
             $('#all-messages').empty();
 
             messages.fetch();
         },
-        getUserInfo: function () {
+        getUserInfo: function appView_doGetUserInfo() {
             var obj = {
                     name: false,
                     active: false
@@ -179,7 +204,7 @@
 
             return obj;
         },
-        toggleMessages: function () {
+        toggleMessages: function appView_doToggleMessages() {
             var diff = 66,
                 lght = 553,
                 smht = 353;
@@ -201,7 +226,7 @@
                 break;
             }
         },
-        doResize: function () {
+        doResize: function appView_doDoResize() {
             var vph  = win.height() - foot.height() - Math.floor($('#messenger-input').height()/2),
                 mgh  = parseInt(this.$el.css('top')) + this.$el.height(),
                 diff = 0;
@@ -214,13 +239,13 @@
                 //this.$el.height(this.$el.height() + diff);
             }
         },
-        remove: function () {
+        remove: function appView_doRemove() {
             win.off('resize');
         }
     });
 
     // Run
-    $(function () {
+    $(function launchApp() {
         foot = $('#footer');
 
         messages  = new MessageList();
@@ -231,13 +256,13 @@
         }
     });
 
-    String.prototype.tmpl = function (obj) {
+    String.prototype.tmpl = function string_doTple(obj) {
         return this.replace(/\{(\w+)\}/g, function (full, match) {
             return obj[match] || full;
         });
     };
 
-    Date.prototype.getOrdinal = function () {
+    Date.prototype.getOrdinal = function date_doGetOridinal() {
         var date = this.getDate(),
             ords = ['th', 'st', 'nd', 'rd'];
 

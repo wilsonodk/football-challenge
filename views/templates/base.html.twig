@@ -9,8 +9,12 @@
     {% endblock %}
     <link rel="shortcut icon" href="http://wilson.odk.com/fc-favicon.ico" />
     <link rel="stylesheet" type="text/css" href="{{ base_path }}/public/app.css" />
-    <script type="text/javascript" src="{{ base_path }}/public/jquery-1.8.2.min.js"></script>
-    <script type="text/javascript" src="{{ base_path }}/public/app.js"></script>
+    <script type="application/javascript" src="{{ base_path }}/public/jquery-1.8.2.min.js"></script>
+    <script type="application/javascript" src="{{ base_path }}/public/app.js"></script>
+    <script type="application/javascript">
+        var basePath = "{{ base_path }}",
+            siteUsers = [{% for user in footer %}"{{ user.name|lower|raw }}"{% if not loop.last %},{% endif %}{% endfor %}];
+    </script>
     {% block head %}
     {% endblock %}
 </head>
