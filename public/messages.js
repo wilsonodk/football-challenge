@@ -11,8 +11,14 @@
         AppView,
         messages,
         messenger,
-        foot,
-        win = $(window);
+        $foot,
+        $allMsgs,
+        $msgInput,
+        $1stMsg,
+        $acctArea,
+        $msgTmpl   = $('#message-template'),
+        $inputTmpl = $('#input-template'),
+        $win       = $(window);
 
     Message = Backbone.Model.extend({
         initialize: function message_doInit() {
@@ -32,7 +38,7 @@
                     month:    months[date.getMonth()],
                     date:     date.getDate(),
                     ordinal:  date.getOrdinal(),
-                    hour:     hour > 12 ? hour - 12 : hour,
+                    hour:     hour > 12 ? hour - 12 : hour || 12,
                     minute:   minute < 10 ? '0' + minute : minute,
                     meridiem: hour >= 12 ? 'pm' : 'am'
                 };
@@ -45,7 +51,7 @@
             var output = input,
                 base = window.basePath,
                 matchArr = [
-                    /(\n|\r)/g,
+                    /(\n|\r|\r\n)/g,
                     new RegExp([ '(?:@)?', '(', window.siteUsers.join('|'), ')' ].join(''), 'gi'),
                     /\*([\w\W]+)?\*/g,
                     /\_([\w\W]+)?\_/g
@@ -69,7 +75,7 @@
     MessageView = Backbone.View.extend({
         tagName: 'div',
         className: 'message',
-        template: _.template($('#message-template').html()),
+        template: _.template($msgTmpl.html()),
         events: {
             'click > .tools .reply': 'toggleReply',
             'click > .tools .reply-cancel': 'toggleReply',
@@ -124,7 +130,7 @@
     MainReplyView = Backbone.View.extend({
         tagName: 'div',
         id: 'messenger-input',
-        template: _.template($('#input-template').html()),
+        template: _.template($inputTmpl.html()),
         events: {
             'click input': 'submitMessage'
         },
@@ -158,7 +164,7 @@
         initialize: function appView_doInit() {
             this.userInfo = this.getUserInfo();
 
-            win.on('orientationchange', _.bind(this.toggleMessages, this));
+            $win.on('orientationchange', _.bind(this.toggleMessages, this));
 
             messages.on('reset', this.addAll, this);
             messages.on('sync', this.resync, this);
@@ -168,14 +174,14 @@
         addOne: function appView_doAddOne(message) {
             var view = new MessageView({model: message});
 
-            $('#all-messages').prepend(view.render().el);
+            $allMsgs.prepend(view.render().el);
         },
         addAll: function appView_doAddAll(models) {
             // Add controls
             var controls = new MainReplyView({model: {}});
 
             if (models.length > 0) {
-                $('#message-first').hide();
+                $1stMsg.hide();
             }
 
             this.$el.append(controls.render().el);
@@ -184,7 +190,7 @@
             messages.each(this.addOne);
         },
         resync: function appView_doResync(model, collection) {
-            $('#all-messages').empty();
+            $allMsgs.empty();
 
             messages.fetch();
         },
@@ -193,7 +199,7 @@
                     name: false,
                     active: false
                 },
-                text = $.trim($('.account-area').text());
+                text = $.trim($acctArea.text());
 
             if (text !== 'Login') {
                 obj = {
@@ -214,7 +220,7 @@
                 case -90:
                     // Shorten
                     this.$el.height(smht);
-                    $('#all-messages').height(smht - diff);
+                    $allMsgs.height(smht - diff);
                 break;
 
                 case 0:
@@ -222,34 +228,25 @@
                 default:
                     // Lengthen
                     this.$el.height(lght);
-                    $('#all-messages').height(lght - diff);
+                    $allMsgs.height(lght - diff);
                 break;
             }
         },
-        doResize: function appView_doDoResize() {
-            var vph  = win.height() - foot.height() - Math.floor($('#messenger-input').height()/2),
-                mgh  = parseInt(this.$el.css('top')) + this.$el.height(),
-                diff = 0;
-
-            if (vph < mgh) {
-                diff = (mgh - vph);
-                this.$el.height(this.$el.height() - diff);
-            }
-            else {
-                //this.$el.height(this.$el.height() + diff);
-            }
-        },
         remove: function appView_doRemove() {
-            win.off('resize');
+            $win.off('resize');
         }
     });
 
     // Run
     $(function launchApp() {
-        foot = $('#footer');
+        $foot      = $('#footer');
+        $allMsgs   = $('#all-messages');
+        $msgInput  = $('#messenger-input');
+        $1stMsg    = $('#message-first');
+        $acctArea  = $('.account-area');
 
-        messages  = new MessageList();
-        messenger = new AppView({el: $('#messenger')});
+        messages   = new MessageList();
+        messenger  = new AppView({el: $('#messenger')});
 
         if (window.orientation !== 0) {
             messenger.toggleMessages();
