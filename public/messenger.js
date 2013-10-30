@@ -1,240 +1,269 @@
-/*jslint es5: true white: true plusplus: true unparam: true */
-/*globals window, document, location, jQuery */
-(function (window, document, location, $) {
-	"use strict";
-	var messenger;
-	
-	/**
-	 *
-	 */
-	function Message(json) {
-		this.template = '\
-			<div class="message" id="messenger-message-{id}">{body}\
-				<div class="tools">\
-					By <strong>{user}</strong> on <em id="posted-{timestamp}">{posted}</em> <span id="messenger-reply-toggle-{id}">&bull; <a class="reply" id="messenger-reply-{id}" href="javascript:;">Reply</a></span>\
-					<div class="input-area" id="messenger-reply-input-{id}">\
-						<textarea rows="2" id="messenger-textarea-{id}" name="message"></textarea><br />\
-						<input type="button" id="messenger-input-{id}-reply" value="Reply" /> or <a class="cancel" id="messenger-reply-cancel-{id}" href="javascript:;">Cancel</a>\
-					</div>\
-				</div>\
-				<div class="replies"></div>\
-			</div>';
-	
-		this.ele		= null;
-		this.id			= json.mid;
-		this.pid		= json.pid !== "0" && json.pid ? json.pid : 0;
-		this.body		= Message.htmlize(json.message);
-		this.user		= json.username;
-		this.uid		= json.uid;
-		this.posted		= this.getDate(json.posted);
-		this.timestamp	= json.posted;
-		this.replies	= [];
-	}
-	Message.htmlize = function (input) {
-		var output = input, 
-			matchArr = [
-				/(\n|\r)/g,
-				/(big blue|bulldog|comish|commish|m'neer|mouth|nd-man|p-dawg|title ix|wiseass)/gi
-			],
-			replaceArr = [
-				"<br>",
-				"<a href=\"./picks/$1\">$1</a>"
-			], 
-			items = matchArr.length;
-			
-		while (items--) {
-			output = output.replace(matchArr[items], replaceArr[items]);
-		}
+/*jslint nomen: true */
+/*globals window, document, jQuery, _, Backbone*/
 
-		return output;
-	};
-	Message.prototype.render = function () {
-		var msg = this.template.template(this);
-		
+(function messagesApp(window, document, $, _, Backbone) {
+    'use strict';
 
-		// Append this to the DOM
-		if (this.pid) {
-			// This is a response
-			$('#messenger-message-'+ this.pid +' > .replies').append(msg);
-		}
-		else {
-			// This is message
-			$('#all-messages').append(msg);
-		}
-		
-		this.ele = $('#messenger-message-'+ this.id);
+    var Message,
+        MessageView,
+        MessageList,
+        MainReplyView,
+        AppView,
+        messages,
+        messenger,
+        $foot,
+        $allMsgs,
+        $msgInput,
+        $1stMsg,
+        $acctArea,
+        $msgTmpl   = $('#message-template'),
+        $inputTmpl = $('#input-template'),
+        $win       = $(window);
 
-		// Now add events
-		this.ele.children('.tools').find('a').click(this, this.toggleReply);
-		$('#messenger-input-' + this.id + '-reply').click(messenger.onClick);
-		
-		return this;
-	};
-	Message.prototype.toggleReply = function (event) {
-		var id = event.data.id;
-		$('#messenger-reply-' + id).toggle();
-		$('#messenger-reply-input-' + id).toggle();
-	};
-	Message.prototype.getDate = function (timestamp) {
-		var months		= ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-			days		= ['Sun', 'Mon', 'Tue', 'Wed', 'Thr', 'Fri', 'Sat'],
-			date		= new Date(timestamp * 1000),
-			hour		= date.getHours(),
-			meridiem	= date.getHours() > 12 ? 'pm' : 'am',
-			minute		= date.getMinutes(),
-			obj			= {
-							day: days[date.getDay()],
-							month: months[date.getMonth()],
-							date: date.getDate(),
-							ordinal: date.getOrdinal(),
-							hour: hour > 12 ? hour - 12 : hour,
-							minute: minute < 10 ? '0' + minute : minute,
-							meridiem: meridiem
-						};
-		
-		// Day, Month Date, Hour:Minute meridiem
-		// Mon, Oct 12, 2:24pm
-		return '{day}., {month}. {date}{ordinal}, {hour}:{minute}{meridiem}'.template(obj);
-	};
-	
-	/**
-	 *
-	 */
-	function Messenger() {
-		this.timer = 0;
-		this.timeOut = 1000 * 60; // One minute
-		this.msgrInputSize = null;
-		this.messages = [];
-	}
-	Messenger.state = 0;
-	Messenger.prototype.init = function () {
-		var self = this;
-		$('#content').append('\
-			<div id="messenger">\
-				<div id="messenger-input">\
-						<textarea rows="2" name="message" disabled="disabled" id="messenger-textarea-main"></textarea><br />\
-						<input type="button" value="Reply" id="messenger-input-main-reply" disabled="disabled" />\
-				</div>\
-				<div id="all-messages">\
-					<div class="message" id="message-first">&nbsp;<br />No messages, yet. Why don\'t you add one?<br />&nbsp;</div>\
-				</div>\
-			</div>\
-		');
-		
-		// Validate
-		$('#messenger-input-main-reply').click(self.onClick);
-		
-		if ($.browser.mozilla) {
-			$('#all-messages').css('height', 471);
-		}
-		
-		this.msgrInputSize = parseInt($("#messenger-input").css("height"), 10) - 7;
-		this.getMessages();
-		this.checkSize();
-		
-		this.timer = window.setInterval(function () {
-			self.getMessages();
-			self.checkSize();
-		}, this.timeOut);
-	};
-	Messenger.prototype.checkSize = function () {
-		var msgr = $('#messenger'),
-			body = $('body');
-			
-	};
-	Messenger.prototype.getMessages = function () {
-		Messenger.state = 1;
-		var root = location.pathname.split('/')[1],
-			path = '/' + root +'/messages';
-		$.ajax({
-			url: path,
-			dataType: 'json',
-			success: Messenger.onSuccess,
-			error: Messenger.onError
-		});
-	};
-	Messenger.onSuccess = function (data) {
-		var i, len = data.messages.length;
-		if (len > 0) {
-			// Hide first message if we have one
-			$('#message-first').hide();
-			
-			if (Messenger.state) {
-				$('#all-messages').html('');
-			}
-			
-			for (i = 0; i < len; i++) {
-				messenger.messages.push((new Message(data.messages[i])).render());
-			}
-			
-			// Is user logged in?
-			if ($('.account-area').text() !== 'Login') {
-				$('#messenger .message .tools span').show();
-			}
-		}
-		if ($('.account-area').text() !== 'Login') {
-			$('#messenger-input-main-reply').attr('disabled', false);
-			$('#messenger-textarea-main').attr('disabled', false);
-		}
-	};
-	Messenger.onError = function (xhr, textStatus, errorThrown) {
-		window.alert('There was an error!\n\n' + errorThrown);
-	};
-	Messenger.onNewMessageSuccess = function (data, textStatus, xhr) {
-		if (data.success) {
-			messenger.getMessages(); 
-		}
-		else {
-			Messenger.onError({}, 'error', "Couldn't save message. " + data.pid);
-		}
-	};
-	Messenger.prototype.onClick = function (evt) {
-		var input		= $(evt.target),
-			id			= input.attr('id').split('-')[2],
-			textarea	= $('#messenger-textarea-' + id),
-			message		= textarea.val(),
-			payload		= {},
-			root		= location.pathname.split('/')[1],
-			path		= '/' + root +'/message/new';
+    Message = Backbone.Model.extend({
+        initialize: function message_doInit() {
+            this.set('id', this.get('mid'));
+            this.set('posted', this.formatDate(this.get('timestamp')));
+            this.set('message', this.htmlize(this.get('message')));
+            this.set('link_name', this.get('username') ? this.get('username').toLowerCase() : '');
+        },
+        formatDate: function message_doFormatDate(timestamp) {
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                days   = ['Sun', 'Mon', 'Tue', 'Wed', 'Thr', 'Fri', 'Sat'],
+                date   = new Date(timestamp),
+                hour   = date.getHours(),
+                minute = date.getMinutes(),
+                obj    = {
+                    day:      days[date.getDay()],
+                    month:    months[date.getMonth()],
+                    date:     date.getDate(),
+                    ordinal:  date.getOrdinal(),
+                    hour:     hour > 12 ? hour - 12 : hour || 12,
+                    minute:   minute < 10 ? '0' + minute : minute,
+                    meridiem: hour >= 12 ? 'pm' : 'am'
+                };
 
-		if (message.length > 0) {			
-			textarea.removeClass('form-error');
-			
-			payload.message = message;
-			payload.id = id;
-			
-			// do it
-			$.ajax({
-				url: path,
-				type: 'post',
-				data: payload,
-				dataType: 'json',
-				success: Messenger.onNewMessageSuccess,
-				error: Messenger.onError
-			});
-		}
-		else {
-			textarea.addClass('form-error').focus();
-		}
-	};
+            // Day, Month Date, Hour:Minute meridiem
+            // Mon, Oct 12, 2:24pm
+            return '{day}., {month}. {date}{ordinal}, {hour}:{minute}{meridiem}'.tmpl(obj);
+        },
+        htmlize: function message_doHtmlize(input) {
+            var output = input,
+                base = window.basePath,
+                matchArr = [
+                    /(\r\n|\n|\r)/g,
+                    new RegExp([ '(?:@)?', '(', window.siteUsers.join('|'), ')' ].join(''), 'gi'),
+                    /\*([\w\W]+)?\*/g,
+                    /\_([\w\W]+)?\_/g
+                ],
+                replaceArr = [
+                    '<br>',
+                    '<a href="' + base + '/picks/$1" class="user">@$1</a>',
+                    '<strong>$1</strong>',
+                    '<em>$1</em>'
+                ],
+                items = matchArr.length;
 
-	// Define everything
-	messenger = window.messenger = new Messenger();
+            while (items--) {
+                output = output.replace(matchArr[items], replaceArr[items]);
+            }
 
-	// Let's go!
-	$(document).ready(function () {
-		messenger.init();
-	});
-	
-	String.prototype.template = function (obj) {
-		return this.replace(/\{(\w+)\}/g, function (full, match) {
-			return obj[match] || full;
-		});
-	};
-	
-	Date.prototype.getOrdinal = function () {
-		var date = this.getDate(), ords = ["th", "st", "nd", "rd"];
-		return ords[(date - 20) % 10] || ords[date] || ords[0];
-	};
+            return output;
+        }
+    });
 
-} (window, document, location, jQuery));
+    MessageView = Backbone.View.extend({
+        tagName: 'div',
+        className: 'message',
+        template: _.template($msgTmpl.html()),
+        events: {
+            'click > .tools .reply': 'toggleReply',
+            'click > .tools .reply-cancel': 'toggleReply',
+            'click > .tools .reply-button': 'submitReply',
+        },
+        render: function messageView_doRender() {
+            var user = this.model.get('username');
+
+            this.$el.html(this.template(this.model.toJSON()));
+
+            _.each(this.model.get('replies'), this.addReplyMessage, this);
+
+            this.tools     = this.$('> .tools > span');
+            this.inputArea = this.$('> .tools .input-area');
+            this.replyText = this.$('> .tools .reply-textarea');
+            this.replyBttn = this.$('> .tools .reply-button');
+
+            return this;
+        },
+        addReplyMessage: function messageView_doAddReplyMessage(message) {
+            var view = new MessageView({model: new Message(message)});
+
+            this.$el.find('> .replies').prepend(view.render().el);
+        },
+        toggleReply: function messageView_doToggleReply(event) {
+            this.tools.toggle();
+            this.inputArea.toggle();
+        },
+        submitReply: function messageView_doSubmitReply() {
+            var payload = {
+                pid: this.model.get('mid'),
+                message: this.replyText.val()
+            };
+
+            if (payload.message) {
+                this.replyBttn.attr('disabled', true);
+                messages.create(payload);
+            }
+        }
+    });
+
+    MessageList = Backbone.Collection.extend({
+        model: Message,
+        url: function messageList_doUrl() {
+            var loc  = document.location,
+                base = window.basePath;
+
+            return loc.origin + base + '/messages';
+        }
+    });
+
+    MainReplyView = Backbone.View.extend({
+        tagName: 'div',
+        id: 'messenger-input',
+        template: _.template($inputTmpl.html()),
+        events: {
+            'click input': 'submitMessage'
+        },
+        render: function mainReplyView_doRender() {
+            this.$el.html(this.template({}));
+
+            this.textarea = this.$('textarea');
+            this.input    = this.$('input');
+
+            if (messenger.userInfo.active) {
+                this.textarea.attr('disabled', false);
+                this.input.attr('disabled', false);
+            }
+
+            return this;
+        },
+        submitMessage: function mainReplyView_doSubmitMessage() {
+            var payload = {
+                pid: 'main',
+                message: this.textarea.val()
+            };
+
+            if (payload.message) {
+                this.input.attr('disabled', true);
+                messages.create(payload);
+            }
+        }
+    });
+
+    AppView = Backbone.View.extend({
+        initialize: function appView_doInit() {
+            this.userInfo = this.getUserInfo();
+
+            $win.on('orientationchange', _.bind(this.toggleMessages, this));
+
+            messages.on('reset', this.addAll, this);
+            messages.on('sync', this.resync, this);
+
+            messages.fetch();
+        },
+        addOne: function appView_doAddOne(message) {
+            var view = new MessageView({model: message});
+
+            $allMsgs.prepend(view.render().el);
+        },
+        addAll: function appView_doAddAll(models) {
+            // Add controls
+            var controls = new MainReplyView({model: {}});
+
+            if (models.length > 0) {
+                $1stMsg.hide();
+            }
+
+            this.$el.append(controls.render().el);
+
+            // Add messages
+            messages.each(this.addOne);
+        },
+        resync: function appView_doResync(model, collection) {
+            $allMsgs.empty();
+
+            messages.fetch();
+        },
+        getUserInfo: function appView_doGetUserInfo() {
+            var obj = {
+                    name: false,
+                    active: false
+                },
+                text = $.trim($acctArea.text());
+
+            if (text !== 'Login') {
+                obj = {
+                    name: $.trim(text.split('|')[0]),
+                    active: true
+                }
+            }
+
+            return obj;
+        },
+        toggleMessages: function appView_doToggleMessages() {
+            var diff = 66,
+                lght = 553,
+                smht = 353;
+
+            switch (window.orientation) {
+                case 90:
+                case -90:
+                    // Shorten
+                    this.$el.height(smht);
+                    $allMsgs.height(smht - diff);
+                break;
+
+                case 0:
+                case 180:
+                default:
+                    // Lengthen
+                    this.$el.height(lght);
+                    $allMsgs.height(lght - diff);
+                break;
+            }
+        },
+        remove: function appView_doRemove() {
+            $win.off('resize');
+        }
+    });
+
+    // Run
+    $(function launchApp() {
+        $foot      = $('#footer');
+        $allMsgs   = $('#all-messages');
+        $msgInput  = $('#messenger-input');
+        $1stMsg    = $('#message-first');
+        $acctArea  = $('.account-area');
+
+        messages   = new MessageList();
+        messenger  = new AppView({el: $('#messenger')});
+
+        if (window.orientation !== 0) {
+            messenger.toggleMessages();
+        }
+    });
+
+    String.prototype.tmpl = function string_doTple(obj) {
+        return this.replace(/\{(\w+)\}/g, function (full, match) {
+            return obj[match] || full;
+        });
+    };
+
+    Date.prototype.getOrdinal = function date_doGetOridinal() {
+        var date = this.getDate(),
+            ords = ['th', 'st', 'nd', 'rd'];
+
+        return ords[(date - 20) % 10] || ords[date] || ords[0];
+    };
+
+}(window, document, jQuery, _, Backbone));
