@@ -243,7 +243,7 @@ class AdminController extends AppController
                     $subject = "{$site_name} Reminder Week {$week}";
                     $message = "{$obj->username},{$rn}Time is running out to enter your picks!{$rn}{$rn}{$url}{$rn}{$rn}{$rn}{$rn}To change your email reminder settings, go to...{$rn}{$acct}{$rn}";
                     $headers = "From: {$commissioners}{$rn}Reply-To: {$commissioners}{$rn}X-Mailer: Football Challenge/{$appv} PHP/{$phpv}";
-                    if ($env === 'prod') {
+                    if ($env === ENV_PRODUCTION) {
                         $log->log('message', sprintf('Reminder email sent to %s', htmlspecialchars($to)));
                         mail($to, $subject, $message, $headers);
                     }
@@ -256,7 +256,7 @@ class AdminController extends AppController
                 $log->log('error', 'Error getting all the users to email.', $db->error);
             }
 
-            if ($env === 'prod') {
+            if ($env === ENV_PRODUCTION) {
                 // We've sent our reminder, let's update the challenge
                 if (! $db->qry('UPDATE {{challenges}} SET reminder_sent = 1 WHERE year = %s AND week = %s', FC_YEAR, $week)) {
                     $log->log('error', 'Error updating the challenges.', $db->error);
