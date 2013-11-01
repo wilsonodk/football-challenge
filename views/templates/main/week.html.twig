@@ -44,6 +44,8 @@
                 <input id="save_btn" type="submit" value="Save"> or {{ macros.link("/", "Cancel", base_path) }}
             </p>
         </form>
+        {% else %}
+            <p>{{ macros.link("/login", "Login", base_path) }} to enter your picks.</p>
         {% endif %}
     {% else %}
         <p>This challenge closed on {{ challenge_info[0].closetime_formatted }}.
