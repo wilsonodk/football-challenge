@@ -113,7 +113,7 @@ class MainController extends AppController
         $db  = option('db');
         $log = option('log');
 
-        $user_info  = option('user_info');
+        $user_info = option('user_info');
 
         $submission = new StdClass;
 
@@ -288,7 +288,7 @@ class MainController extends AppController
         }
         else {
             if ($result = $db->qry('SELECT username AS name FROM {{users}} ORDER BY username')) {
-                $users = [];
+                $users = array();
 
                 while ($obj = $result->fetch_object()) {
                     $users[] = $obj->name;
