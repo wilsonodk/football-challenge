@@ -1,5 +1,7 @@
 {% extends "base.html.twig" %}
 
+{% use "messenger.html.twig" %}
+
 {% block head %}
     {{ parent() }}
 {% endblock %}
@@ -14,4 +16,7 @@
         <p>{{ macros.link(link_url, user, base) }}</p>
     {% endfor %}
 
+    {% block messenger %}
+        {{ parent() }}
+    {% endblock %}
 {% endblock %}
