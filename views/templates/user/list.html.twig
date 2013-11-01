@@ -1,0 +1,22 @@
+{% extends "base.html.twig" %}
+
+{% use "messenger.html.twig" %}
+
+{% block head %}
+    {{ parent() }}
+{% endblock %}
+
+{% block content %}
+    {{ parent() }}
+
+    <h2>Pick a User</h2>
+
+    {% for user in user_list %}
+        {% set link_url %}picks/{{ user|lower }}{% endset %}
+        <p>{{ macros.link(link_url, user, base) }}</p>
+    {% endfor %}
+
+    {% block messenger %}
+        {{ parent() }}
+    {% endblock %}
+{% endblock %}

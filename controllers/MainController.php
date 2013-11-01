@@ -99,8 +99,12 @@ class MainController extends AppController
         }
     }
 
-    static function week($week_num) {
+    static function week($week_num = FALSE) {
         $user_info = option('user_info');
+
+        if ($week_num === FALSE) {
+            $week_num = option('challenge_week');
+        }
 
         return self::week_user($week_num, $user_info['name']);
     }
@@ -226,26 +230,30 @@ class MainController extends AppController
 
     }
 
-    static function picks($user) {
-        $user_info = self::getUserInfoFromName($user);
+    static function picks($user = FALSE) {
+        $db  = option('db');
+        $log = option('log');
+
+        if ($user) {
+            $user_info = self::getUserInfoFromName($user);
+        } else {
+            $user_info = option('user_info');
+        }
 
         if ($user_info['name'] && $user_info['uid']) {
-            $db  = option('db');
-            $log = option('log');
-
             $db
-            ->setQuery(
-                'challenge',
-                'SELECT c.cid, c.week, c.home_sid AS home_sid, hs.school AS home_school,
-                hs.conference AS home_conf, c.away_sid AS away_sid, vs.school AS away_school, vs.conference AS away_conf, c.winner_sid AS winner_sid
-                FROM {{challenges}} c, {{schools}} hs, {{schools}} vs WHERE c.home_sid = hs.sid AND c.away_sid = vs.sid AND c.year = %s',
-                FC_YEAR
-            )
-            ->setQuery(
-                'user',
-                'SELECT week, subvalue FROM {{submissions}} WHERE uid = %s',
-                $user_info['uid']
-            );
+                ->setQuery(
+                    'challenge',
+                    'SELECT c.cid, c.week, c.home_sid AS home_sid, hs.school AS home_school,
+                    hs.conference AS home_conf, c.away_sid AS away_sid, vs.school AS away_school, vs.conference AS away_conf, c.winner_sid AS winner_sid
+                    FROM {{challenges}} c, {{schools}} hs, {{schools}} vs WHERE c.home_sid = hs.sid AND c.away_sid = vs.sid AND c.year = %s',
+                    FC_YEAR
+                )
+                ->setQuery(
+                    'user',
+                    'SELECT week, subvalue FROM {{submissions}} WHERE uid = %s',
+                    $user_info['uid']
+                );
 
             // Get all of our challenges
             $challenges = array();
@@ -279,14 +287,35 @@ class MainController extends AppController
             ));
         }
         else {
-            halt(NOT_FOUND);
+            if ($result = $db->qry('SELECT username AS name FROM {{users}} ORDER BY username')) {
+                $users = [];
+
+                while ($obj = $result->fetch_object()) {
+                    $users[] = $obj->name;
+                }
+
+                return self::template('user/list.html.twig', array(
+                    'page_name' => 'Pick a User',
+                    'title'     => 'Pick a User',
+                    'user_list' => $users,
+                ));
+            }
+            else {
+                $log->log('error', 'Issue with getting all users on picks.');
+                halt(SERVER_ERROR);
+            }
         }
     }
 
-    static function picks_week($week) {
+    static function picks_week($week = FALSE) {
         $db = option('db');
         $log = option('log');
+
         $year = FC_YEAR;
+        if ($week === FALSE) {
+            $week = option('standings_week');
+        }
+
         $db->setQuery(
             'challenge',
             'SELECT c.cid, c.week, c.home_sid AS home_sid, hs.school AS home_school,
