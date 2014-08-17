@@ -212,7 +212,7 @@
                 {% endfor %}
             {% endset %}
             {% if challenge.winner_sid > 0 %}
-                {% for pick in submission.challenges %}
+                {% for pick in submission.challenges if pick.cid > 0 %}
                     {% if pick.cid == challenge.cid %}
                         {% if pick.sid == challenge.away_sid %}
                             {% if pick.sid == challenge.winner_sid %}
@@ -228,6 +228,8 @@
                             {% endif %}
                         {% endif %}
                     {% endif %}
+                {% else %}
+                    {% set lose_count = lose_count + 1 %}
                 {% endfor %}
             {% else %}
                 {% set wait_count = wait_count + 1 %}
