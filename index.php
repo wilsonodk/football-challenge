@@ -126,7 +126,9 @@ function configure() {
         }
     }
     $challenge_weeks_len = count($challenge_weeks);
-    $challenge_weeks[$challenge_weeks_len - 1]['path'] = '/week/' . $challenge_weeks[$challenge_weeks_len - 1]['num'];
+    if ($challenge_weeks_len > 0) {
+        $challenge_weeks[$challenge_weeks_len - 1]['path'] = '/week/' . $challenge_weeks[$challenge_weeks_len - 1]['num'];
+    }
     option('challenge_weeks', $challenge_weeks);
 
     // Challenge Week
