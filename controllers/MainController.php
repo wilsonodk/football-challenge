@@ -443,6 +443,12 @@ class MainController extends AppController
     /* HELPERS                                                                */
     /**************************************************************************/
 
+    static function get_percentage($wins, $loses) {
+        $total = $wins + $loses;
+
+        return $total > 0 ? round(($wins / $total) * 100, 2) : 0;
+    }
+
     static function get_standings() {
         $db    = option('db');
         $i     = 1;
@@ -461,7 +467,7 @@ class MainController extends AppController
                 $temp->place = '';
                 $temp->path  = ($obj->submission ? "/week/$week/" : '/picks/' ) . strtolower($obj->username);
                 $temp->alt   = $obj->submission ? 'Picks for this week' : 'All picks';
-                $temp->per   = round(($temp->wins / ($temp->wins + $temp->loses)) * 100, 2);
+                $temp->per   = self::get_percentage($temp->wins, $temp->loses);
 
                 // Set proper place
                 if ($temp->wins !== $score) {
