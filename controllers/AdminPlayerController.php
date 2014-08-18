@@ -52,8 +52,8 @@ class AdminPlayerController extends AdminController
         if (self::checkPerms()) {
             $db = option('db');
             $log = option('log');
-            // uid, username, email, password, wins, loses, permissions
-            $query = 'INSERT INTO {{users}} VALUES (NULL, "%s", "%s", "%s", 0, 0, %s, 0)';
+            // uid, username, email, password, wins, loses, permissions, submission, reminder
+            $query = 'INSERT INTO {{users}} VALUES (NULL, "%s", "%s", "%s", 0, 0, %s, 0, 1)';
 
             if ($db->qry(
                     $query,
