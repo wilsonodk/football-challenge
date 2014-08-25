@@ -99,14 +99,15 @@ class AdminPlayerController extends AdminController
         if (self::checkPerms()) {
             $db = option('db');
             $log = option('log');
-            // uid, username, email, password, wins, loses, permissions
+            // uid, username, email, password, wins, loses, permissions, reminder
             $db->setQuery(
                 'update',
-                'UPDATE {{users}} SET username = "%s", email = "%s", password = "%s", permissions = %s WHERE uid = %s',
+                'UPDATE {{users}} SET username = "%s", email = "%s", password = "%s", permissions = %s, reminder = %s WHERE uid = %s',
                 $db->escape_string(strtoupper(get_post('username'))),
                 $db->escape_string(strtolower(get_post('email'))),
                 $db->escape_string(get_post('password')),
                 $db->escape_string(get_post('permissions')),
+                get_post('reminder') === 'yes' ? 1 : 0,
                 $id
             );
 
