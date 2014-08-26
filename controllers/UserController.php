@@ -14,7 +14,7 @@ class UserController extends AppController
         $log      = option('log');
         $referrer = get_post('referrer');
         $username = $db->escape_string(get_post('username'));
-        $password = $db->escape_string(get_post('password'));
+        $password = self::password(get_post('username'), get_post('password'));
 
         if ($result = $db->qry('SELECT uid, username, permissions FROM {{users}} WHERE username = "%s" AND password = "%s"', $username, $password)) {
             if ($result->num_rows === 1) {
@@ -100,9 +100,9 @@ class UserController extends AppController
         $reminder         = get_post('reminder') === 'yes' ? 1 : 0;
         $current_reminder = (int) get_post('current_reminder');
         $password         = array(
-            'old'   => get_post('password'),
-            'new'   => get_post('new-password'),
-            'again' => get_post('new-password-again'),
+            'old'   => self::password(get_post('username'), get_post('password')),
+            'new'   => self::password(get_post('username'), get_post('new-password')),
+            'again' => self::password(get_post('username'), get_post('new-password-again')),
         );
         $pw_query         = FALSE;
         $email_query      = $email === $current_email ? FALSE : TRUE;
@@ -113,7 +113,7 @@ class UserController extends AppController
             'SELECT password FROM {{users}} WHERE uid = %s AND username = "%s" AND password = "%s"',
             $db->escape_string($uid),
             $db->escape_string($username),
-            $db->escape_string($password['old'])
+            $password['old']
         )
         ->setQuery(
             'email',
@@ -142,10 +142,10 @@ class UserController extends AppController
                                 $db->setQuery(
                                     'password',
                                     'UPDATE {{users}} SET password = "%s" WHERE uid = %s AND username = "%s" AND password = "%s"',
-                                    $db->escape_string($password['new']),
+                                    $password['new'],
                                     $db->escape_string($uid),
                                     $db->escape_string($username),
-                                    $db->escape_string($password['old'])
+                                    $password['old']
                                 );
                             }
                             else {

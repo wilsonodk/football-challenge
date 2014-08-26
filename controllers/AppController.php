@@ -34,6 +34,10 @@ class AppController
     // Additional AppController methods
     //
 
+    static function password($user, $raw) {
+        return md5(SITE_NAME . strtoupper($user) . $raw);
+    }
+
     static function getUserInfoFromName($name) {
         $query = 'SELECT uid, username, email, permissions, password, reminder, submission FROM {{users}} WHERE username = "%s"';
         $info = self::getUserInfo($query, $name);
