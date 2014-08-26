@@ -22,6 +22,15 @@
     <p>{% if activity == 'Create' or activity == 'Edit' %}<input type="password" name="password" value="{{ player.password|default('feesball') }}" />{% else %}{{ player.password }}{% endif %}</p>
     {% endif %}
 
+    <h3>Reminder Email</h3>
+    {% if activity == 'Create' %}
+        <p>Email reminder is set <strong>on</strong>.</p>
+    {% elseif activity == 'Edit' %}
+        <p><input type="checkbox" name="reminder" value="yes"{% if player.reminder %} checked="checked"{% endif %} /> Send reminder email.</p>
+    {% else %}
+        <p>Email reminder is set <strong>{% if player.reminder %}on{% else %}off{% endif %}</strong>.</p>
+    {% endif %}
+
     <h3>Permissions</h3>
     {% if activity == 'Create' or activity == 'Edit' %}
         {% spaceless %}
