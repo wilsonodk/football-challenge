@@ -9,3 +9,4 @@ BUILD_VERSION.txt
 ENVIRONMENT.txt
 vendor
 vendors
+update.sql
