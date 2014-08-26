@@ -59,7 +59,7 @@ class AdminPlayerController extends AdminController
                     $query,
                     $db->escape_string(strtoupper(get_post('username'))),
                     $db->escape_string(strtolower(get_post('email'))),
-                    $db->escape_string(get_post('password')),
+                    self::password(get_post('username'), get_post('password')),
                     $db->escape_string(get_post('permissions'))
                 ))
             {
@@ -105,7 +105,7 @@ class AdminPlayerController extends AdminController
                 'UPDATE {{users}} SET username = "%s", email = "%s", password = "%s", permissions = %s, reminder = %s WHERE uid = %s',
                 $db->escape_string(strtoupper(get_post('username'))),
                 $db->escape_string(strtolower(get_post('email'))),
-                $db->escape_string(get_post('password')),
+                self::password(get_post('username'), get_post('password')),
                 $db->escape_string(get_post('permissions')),
                 get_post('reminder') === 'yes' ? 1 : 0,
                 $id
