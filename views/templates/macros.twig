@@ -127,33 +127,29 @@
 {% macro win_loss_count(challenges, user_picks, base_path) %}
     {% set wins = 0 %}
     {% set losses = 0 %}
+    {% set pending = 0 %}
 
     {% for challenge in challenges %}
         {% for pick in user_picks %}
             {% if challenge.cid == pick.cid %}
-                {% if challenge.winner_sid == pick.sid %}
-                    {% set wins = wins + 1 %}
+                {% if challenge.winner_sid > 0 %}
+                    {% if challenge.winner_sid == pick.sid %}
+                        {% set wins = wins + 1 %}
+                    {% else %}
+                        {% set losses = losses + 1 %}
+                    {% endif %}
                 {% else %}
-                    {% set losses = losses + 1 %}
+                    {% set pending = pending + 1 %}
                 {% endif %}
             {% endif %}
         {% endfor %}
     {% endfor %}
 
     {% if wins == 0 and losses == 0 %}
-        {% set losses = 10 %}
+        {% set losses = 10 - pending %}
     {% endif %}
 
-    <p>
-        <span class="pick-results won">
-            {{ _self.icon_win(base_path) }}
-            Wins: {{ wins }}
-        </span>
-        <span class="pick-results result lost">
-            {{ _self.icon_loss(base_path) }}
-            Losses: {{ losses }}
-        </span>
-    </p>
+    <p>{{ _self.results_counter(wins, losses, pending, base_path) }}</p>
 
 {% endmacro %}
 
@@ -171,7 +167,7 @@
 
 {% macro picks_table(challenges, submission, base_path) %}
     {% set wins_count = 0 %}
-    {% set lose_count = 0 %}
+    {% set loss_count = 0 %}
     {% set wait_count = 0 %}
     {{ _self.table('week-table') }}
         <tr>
@@ -218,31 +214,59 @@
                             {% if pick.sid == challenge.winner_sid %}
                                 {% set wins_count = wins_count + 1 %}
                             {% else %}
-                                {% set lose_count = lose_count + 1 %}
+                                {% set loss_count = loss_count + 1 %}
                             {% endif %}
                         {% elseif pick.sid == challenge.home_sid %}
                             {% if pick.sid == challenge.winner_sid %}
                                 {% set wins_count = wins_count + 1 %}
                             {% else %}
-                                {% set lose_count = lose_count + 1 %}
+                                {% set loss_count = loss_count + 1 %}
                             {% endif %}
                         {% endif %}
                     {% endif %}
                 {% else %}
-                    {% set lose_count = lose_count + 1 %}
+                    {% set loss_count = loss_count + 1 %}
                 {% endfor %}
             {% else %}
                 {% set wait_count = wait_count + 1 %}
             {% endif %}
             <tr>
-                <td width="35%" class="{{ away_class|one_space }}">{{ _self.get_icon(challenge.away_sid, challenge.winner_sid, base_path) }} {{ challenge.away_school }}</td>
-                <td width="15%" class="conference {{ away_class|one_space }}">{{ challenge.away_conf }}</td>
-                <td width="35%" class="{{ home_class|one_space }}">{{ _self.get_icon(challenge.home_sid, challenge.winner_sid, base_path) }} {{ challenge.home_school }}</td>
-                <td width="15%" class="conference {{ home_class|one_space }}">{{ challenge.home_conf }}</td>
+                <td width="35%" class="{{ away_class|one_space }}">
+                    {{ _self.get_icon(challenge.away_sid, challenge.winner_sid, base_path) }} {{ challenge.away_school }}
+                </td>
+                <td width="15%" class="conference {{ away_class|one_space }}">
+                    {{ challenge.away_conf }}
+                </td>
+                <td width="35%" class="{{ home_class|one_space }}">
+                    {{ _self.get_icon(challenge.home_sid, challenge.winner_sid, base_path) }} {{ challenge.home_school }}
+                </td>
+                <td width="15%" class="conference {{ home_class|one_space }}">
+                    {{ challenge.home_conf }}
+                </td>
             </tr>
         {% endfor %}
     </table>
-    <p>
-        <span class="pick-results won">{{ _self.icon_win(base_path) }} Wins: {{ wins_count }}</span><span class="pick-results result lost">{{ _self.icon_loss(base_path) }} Losses: {{ lose_count }}</span>{% if wait_count > 0 %}<span class="pick-results result waiting">{{ _self.icon_loss(base_path) }} Pending: {{ wait_count }}</span>{% endif %}
-    </p>
+
+    {% if wins_count == 0 and loss_count == 0 %}
+        {% set loss_count = 10 - wait_count %}
+    {% endif %}
+
+    <p>{{ _self.results_counter(wins_count, loss_count, wait_count, base_path) }}</p>
+{% endmacro %}
+
+{% macro results_counter(wins, losses, pending, base_path) %}
+    <span class="pick-results won">
+        {{ _self.icon_win(base_path) }}
+        Wins: {{ wins }}
+    </span>
+    <span class="pick-results result lost">
+        {{ _self.icon_loss(base_path) }}
+        Losses: {{ losses }}
+    </span>
+    {% if pending > 0 %}
+        <span class="pick-results result waiting">
+            {{ _self.icon_loss(base_path) }}
+            Pending: {{ pending }}
+        </span>
+    {% endif %}
 {% endmacro %}
