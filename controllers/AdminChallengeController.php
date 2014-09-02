@@ -50,7 +50,7 @@ class AdminChallengeController extends AdminController
                 );
                 $temp = new StdClass;
                 $temp->cid = $db->insert_id;
-                $temp->sid = 0;
+                $temp->sid = 999;
                 $user_challenges[] = $temp;
             }
 
