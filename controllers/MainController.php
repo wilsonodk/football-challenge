@@ -385,27 +385,30 @@ class MainController extends AppController
                     $user->challenge = $temp->challenges;
                     $user->wins = 0;
                     $user->losses = 0;
+                    $user->pending = 0;
                     $user->username = $twigish->convertStringToCssId($user->username);
                 }
 
                 // To get weekly stat
                 // 1. go through each challenge
                 // 2. compare against each user's pick
-                // 3. if successful, give a win
-                // 4. compare number of wins to number of challenges, diff is losses
+                // 3a. if successful, give a win
+                // 3b. if failure, give loss
+                // 3c. if not finished, give pending
                 foreach ($output['challenge'] as $cid => $challenge) {
                     foreach ($output['users'] as $user) {
                         foreach ($user->challenge as $user_pick) {
                             if ($user_pick->cid == $cid) {
-                                if ($user_pick->sid === $challenge->winner_sid) {
-                                    $user->wins++;
+                                if ($challenge->winner_sid) {
+                                    if ($user_pick->sid === $challenge->winner_sid) {
+                                        $user->wins++;
+                                    } else {
+                                        $user->losses++;
+                                    }
+                                } else {
+                                    $user->pending++;
                                 }
                             }
-                        }
-
-                        if ($user->wins < FC_NUM_CHALLENGES) {
-                            $diff = FC_NUM_CHALLENGES - $user->wins;
-                            $user->losses = $diff;
                         }
                     }
                 }
