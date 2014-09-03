@@ -92,6 +92,8 @@ class MainController extends AppController
                 'week_num' => $week_num,
                 'show_form' => $show_form,
                 'user_active' => $user_info['use'],
+                'user_logged_in' => $logged_user['use'],
+                'show_results' => self::show_results($challenge_active, $user_info['uid'], $logged_user['uid']),
             ));
         }
         else {
@@ -494,6 +496,22 @@ class MainController extends AppController
             die($db->error);
         }
         return $arr;
+    }
+
+    /**
+     * If the challenge is active, only show the results if the user page and active user match
+     * If the challenge is inactive, always show the results
+     */
+    static function show_results($challenge_active, $user_page, $active_user) {
+        $log = option('log');
+
+        if ($challenge_active) {
+            $log->log('info', 'User page', $user_page);
+            $log->log('info', 'Active user', $active_user);
+            return ($user_page === $active_user);
+        } else {
+            return TRUE;
+        }
     }
 }
 
