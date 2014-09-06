@@ -83,5 +83,9 @@ class AppController
 
         return $referrer;
     }
+
+    static function getEnv() {
+        return (int) option('env');
+    }
 }
 ?>

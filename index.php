@@ -101,7 +101,7 @@ function configure() {
     option('db', $db->setPrefix(DB_PFIX));
 
     // Setup template engine
-    $cache  = $env == ENV_PRODUCTION ? CACHE_DIR : FALSE;
+    $cache  = $env === ENV_PRODUCTION ? CACHE_DIR : FALSE;
     $loader = new Twig_Loader_Filesystem(TEMPLATE_DIR);
     $twig   = new Twig_Environment($loader, array(
         'cache' => $cache,

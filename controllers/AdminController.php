@@ -226,7 +226,7 @@ class AdminController extends AppController
 
         $site_name = SITE_NAME;
 
-        $env = trim(option('env'));
+        $env = self::getEnv();
 
         // Get commissioners
         if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE permissions = 2')) {
@@ -247,8 +247,11 @@ class AdminController extends AppController
                         $log->log('message', sprintf('Reminder email sent to %s', htmlspecialchars($to)));
                         mail($to, $subject, $message, $headers);
                     }
-                    else {
+                    elseif ($env === ENV_DEVELOPMENT) {
                         echo htmlspecialchars("{$headers}{$rn}{$rn}To: {$to}{$rn}{$rn}{$subject}{$rn}{$rn}$message{$rn}- - -{$rn}");
+                    }
+                    else {
+                        $log->log('error', sprintf('Unmatched environment variable env(%s):%s', $env, gettype($env)));
                     }
                 }
             }
