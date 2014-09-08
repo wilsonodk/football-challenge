@@ -2,6 +2,15 @@
 
 {% block head %}
     {{ parent() }}
+    {% if not show_results %}
+        <style type="text/css">
+            #content td.picked {
+                background-color: inherit;
+                font-weight: inherit;
+            }
+        </style>
+        <script>{{ now }}</script>
+    {% endif %}
     <script type="application/javascript">
         var useTab = {{ week_num }};
     </script>

@@ -52,6 +52,7 @@ class AppController
 
     static function getUserInfo($query, $arg) {
         $db = option('db');
+        $log = option('log');
         $usr = option('empty_user');
 
         if ($result = $db->qry($query, $arg)) {
@@ -65,6 +66,8 @@ class AppController
                 $usr['reminder'] = $obj->reminder;
                 $usr['sub']      = $obj->submission;
             }
+        } else {
+            $log->log('error', 'Issue fetching user info', $db->error);
         }
 
         return $usr;
