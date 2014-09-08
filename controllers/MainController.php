@@ -25,16 +25,8 @@ class MainController extends AppController
 
         if (is_numeric($week_num) && $week_num <= $challenge_week) {
             // First determine if challenge is active, default is no
-            $challenge_active = FALSE;
             if ($week_num == $challenge_week) {
-                // Maybe
-                $now = time();
-                if ($result = $db->qry('SELECT DISTINCT week FROM {{challenges}} WHERE closetime > %s AND year = %s', $now, FC_YEAR)) {
-                    while ($obj = $result->fetch_object()) {
-                        $challenge_active = TRUE;
-                        $show_form = TRUE;
-                    }
-                }
+                $challenge_active = $show_form = self::is_challenge_active($week_num);
             }
 
             // There are some scenarios where we don't want to show the form
@@ -236,13 +228,14 @@ class MainController extends AppController
         $db  = option('db');
         $log = option('log');
 
-        if ($user) {
-            $user_info = self::getUserInfoFromName($user);
-        } else {
-            $user_info = option('user_info');
-        }
+        $logged_user = option('user_info');
+        $user_info = self::getUserInfoFromName($user);
+        $challenge_week = (int) option('challenge_week');
+        $challenge_active = FALSE;
 
         if ($user_info['name'] && $user_info['uid']) {
+            $challenge_active = self::is_challenge_active();
+
             $db
                 ->setQuery(
                     'challenge',
@@ -286,6 +279,7 @@ class MainController extends AppController
                 'title'      => sprintf('%s\'s Picks', strtoupper($user_info['name'])),
                 'challenges' => array_reverse($challenges),
                 'user_subs'  => $user_challenge_info,
+                'show_results' => self::show_results($challenge_active, $user_info['uid'], $logged_user['uid']),
             ));
         }
         else {
@@ -318,6 +312,9 @@ class MainController extends AppController
             $week = option('standings_week');
         }
 
+        $challenge_week = option('challenge_week');
+        $challenge_active = self::is_challenge_active($week);
+
         $db->setQuery(
             'challenge',
             'SELECT c.cid, c.week, c.home_sid AS home_sid, hs.school AS home_school,
@@ -327,28 +324,34 @@ class MainController extends AppController
             $week
         );
 
-        if ($result = $db->useQuery('challenge')) {
-            $challenge = array();
-            while ($obj = $result->fetch_object()) {
-                $challenge[] = $obj;
-            }
-
-            // Get all the user submissions for this week
-            $submissions = array();
-            if ($results = $db->qry('SELECT subvalue FROM {{submissions}} WHERE year = %s AND week = %s ORDER BY subkey', $year, $week)) {
-                while ($obj = $results->fetch_object()) {
-                    $submissions[] = unserialize($obj->subvalue);
+        if (is_numeric($week) && $week <= $challenge_week)
+            if ($result = $db->useQuery('challenge')) {
+                $challenge = array();
+                while ($obj = $result->fetch_object()) {
+                    $challenge[] = $obj;
                 }
-            }
 
-            return self::template('main/picks-week.html.twig', array(
-                'page_name'   => "Week $week Picks",
-                'title'       => "Week $week Picks",
-                'challenge'   => $challenge,
-                'submissions' => $submissions,
-                'week_num'    => $week,
-            ));
-        }
+                // Get all the user submissions for this week
+                $submissions = array();
+                if ($results = $db->qry('SELECT subvalue FROM {{submissions}} WHERE year = %s AND week = %s ORDER BY subkey', $year, $week)) {
+                    while ($obj = $results->fetch_object()) {
+                        $submissions[] = unserialize($obj->subvalue);
+                    }
+                }
+
+                return self::template('main/picks-week.html.twig', array(
+                    'page_name'    => "Week $week Picks",
+                    'title'        => "Week $week Picks",
+                    'challenge'    => $challenge,
+                    'submissions'  => $submissions,
+                    'week_num'     => $week,
+                    'show_results' => self::show_results($challenge_active, 1, 2),
+                ));
+            }
+            else {
+                $log->log('error', 'Issue with challenge query.', $db->error);
+                halt(SERVER_ERROR);
+            }
         else {
             halt(NOT_FOUND);
         }
@@ -506,12 +509,35 @@ class MainController extends AppController
         $log = option('log');
 
         if ($challenge_active) {
-            $log->log('info', 'User page', $user_page);
-            $log->log('info', 'Active user', $active_user);
             return ($user_page === $active_user);
         } else {
             return TRUE;
         }
+    }
+
+    /**
+     * Determine if a specific challenge is active or if any challenge is active
+     */
+    static function is_challenge_active($week=NULL) {
+        $db = option('db');
+
+        $is_active = FALSE;
+        $challenge_week = (int) option('challenge_week');
+        $week = is_null($week) ? NULL : (int) $week;
+
+        if (is_null($week) || ($week && $week === $challenge_week)) {
+            $now = time();
+            if ($result = $db->qry('SELECT DISTINCT week FROM {{challenges}} WHERE closetime > %s AND year = %s', $now, FC_YEAR)) {
+                while ($obj = $result->fetch_object()) {
+                    $selected_week = (int) $obj->week;
+                    if ($selected_week === $challenge_week) {
+                        $is_active = TRUE;
+                    }
+                }
+            }
+        }
+
+        return $is_active;
     }
 }
 
