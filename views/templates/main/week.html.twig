@@ -15,6 +15,15 @@
         userData = {};
     {% endif %}
     </script>
+
+    {% if not show_results %}
+    <style type="text/css">
+    .user-pick {
+        background-color: inherit;
+        font-weight: inherit;
+    }
+    </style>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -44,6 +53,8 @@
                 <input id="save_btn" type="submit" value="Save"> or {{ macros.link("/", "Cancel", base_path) }}
             </p>
         </form>
+        {% elseif user_logged_in %}
+            <p>Visit {{ macros.link("/week", "your page", base_path) }} to enter your picks.</p>
         {% else %}
             <p>{{ macros.link("/login", "Login", base_path) }} to enter your picks.</p>
         {% endif %}
