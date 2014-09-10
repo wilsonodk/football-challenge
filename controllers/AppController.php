@@ -24,9 +24,11 @@ class AppController
 
     // Template method
     static function template($template, $extra_params = array()) {
-        $twig   = option('twig');
-        $params = array_merge(option(), $extra_params);
-        $tmpl   = $twig->loadTemplate($template);
+        $twig      = option('twig');
+        $constants = get_defined_constants(TRUE);
+        $params    = array_merge(option(), $constants['user'], $extra_params);
+        $tmpl      = $twig->loadTemplate($template);
+
         return $tmpl->render($params);
     }
 

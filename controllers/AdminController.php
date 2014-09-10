@@ -174,7 +174,7 @@ class AdminController extends AppController
                     // If it's not in TEMP, put it there with a bad pick
                     $missing = new StdClass;
                     $missing->cid = $key;
-                    $missing->sid = 9999;
+                    $missing->sid = FC_DEFAULT_VALUE;
 
                     // Add it to their arr
                     $arr[] = $missing;

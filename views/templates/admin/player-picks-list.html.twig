@@ -1,0 +1,25 @@
+{% extends "admin/admin.html.twig" %}
+
+{% block content %}
+    {{ parent() }}
+
+    <h2>{{ username }}{{ page_name }}</h2>
+
+    <ul>
+    {% for player in players %}
+        {% set url %}/player/{{ player.uid }}/picks{% endset %}
+        <li>{{ macros.link(url, player.username, base_admin) }}</li>
+    {% else %}
+    {% endfor %}
+    {% for week in weeks %}
+        {% set action %}{% if week.status %}Edit{% else %}Create{% endif %}{% endset %}
+        {% set title %}{{ action }} Week {{ week.num }}{% endset %}
+        {% set url %}./picks/{{ week.num }}{% endset %}
+        <li>{{ macros.link(url, title, '') }}</li>
+    {% else %}
+    {% endfor %}
+    </ul>
+
+    <p>{{ macros.link(back_url, 'Back', '') }}</p>
+
+{% endblock %}

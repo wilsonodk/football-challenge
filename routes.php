@@ -74,6 +74,11 @@ dispatch('/commissioner/player/:id/edit',          'AdminPlayerController::playe
 dispatch_put('/commissioner/player/:id/edit',      'AdminPlayerController::player_do_edit');
 dispatch('/commissioner/player/:id/delete',        'AdminPlayerController::player_show_delete');
 dispatch_delete('/commissioner/player/:id/delete', 'AdminPlayerController::player_do_delete');
+// Player's Picks
+dispatch('/commissioner/players/picks',                'AdminPlayerPicksController::players');
+dispatch('/commissioner/player/:uid/picks',            'AdminPlayerPicksController::player_picks');
+dispatch('/commissioner/player/:uid/picks/:week',      'AdminPlayerPicksController::player_picks_week');
+dispatch_post('/commissioner/player/:uid/picks/:week', 'AdminPlayerPicksController::save_player_picks_week');
 
 /*
  * == UserController ==
