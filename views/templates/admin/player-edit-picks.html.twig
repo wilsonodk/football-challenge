@@ -1,0 +1,67 @@
+{% extends "admin/admin.html.twig" %}
+
+{% block head %}
+    {{ parent() }}
+    <style type="text/css">
+    ul.zcxv {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    li.qwer {
+        margin: 0;
+        border: 1px solid #eee;
+        padding: 5px 10px;
+    }
+    li.qwer:hover {
+        background-color: #ffe;
+    }
+    span.asdf {
+        display: inline-block;
+        width: 250px;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {{ parent() }}
+
+    <form method="post">
+        <ul class="zcxv">
+        {% for challenge in challenges %}
+            <li class="qwer">
+                <span class="asdf">
+                    <input type="radio" name="challenge-{{ challenge.cid }}"
+                    {{ _self.is_selected(challenge.home_sid, challenge.user_selection) }}
+                    value="{{ challenge.home_sid }}" />
+                    {{ challenge.home_school }}
+                </span>
+                <span class="asdf">
+                    <input type="radio" name="challenge-{{ challenge.cid }}"
+                    {{ _self.is_selected(challenge.away_sid, challenge.user_selection) }}
+                    value="{{ challenge.away_sid }}" />
+                    {{ challenge.away_school }}
+                </span>
+                <span class="asdf">
+                    <input type="radio" name="challenge-{{ challenge.cid }}"
+                    {{ _self.is_selected(FC_DEFAULT_VALUE, challenge.user_selection) }}
+                    value="{{ FC_DEFAULT_VALUE }}" />
+                    No Selection
+                </span>
+            </li>
+        {% else %}
+            <li>No Challenges</li>
+        {% endfor %}
+        </ul>
+        <p><input type="Submit" value="{{ action }} Picks" name="submit" /> or {{ macros.link('../picks', 'Cancel', '') }}</p>
+    </form>
+
+    {% macro is_selected(sid, selected_sid) %}
+        {% if sid == selected_sid %}
+            checked="checked"
+        {% endif %}
+    {% endmacro %}
+
+{% endblock %}
+
+

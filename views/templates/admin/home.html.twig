@@ -1,5 +1,15 @@
 {% extends "admin/admin.html.twig" %}
 
+{% block head %}
+    {{ parent() }}
+    <style type="text/css">
+    p {
+        font-size: 10px;
+        color: gray;
+    }
+    </style>
+{% endblock %}
+
 {% block content %}
     {{ parent() }}
 
@@ -15,17 +25,31 @@
     </table>
 
     <h3>Weekly Challenge Tasks</h3>
+    <p>These tasks allow a Commissioner to Create or Modify a Challenge. Additionally, they allow the Commissioner to create standing and check the status of games.</p>
     <ul>
         <li>{{ _self.challenge_link(challenge_state, base_admin, macros) }}</li>
         <li>{{ macros.link("/standings", "Re-run Standings", base_admin) }}</li>
         <li>{{ macros.link("/challenge/check", "Check Games", base_admin) }} <span style="color: #999; font-size: smaller;">(This is automated)</span></li>
     </ul>
 
+    <hr />
+
     <h3>Player Tasks</h3>
+    <p>These tasks allow a Commissioner to Create, Modify or Delete a Player.
     <ul>
         <li>{{ macros.link("/player/new", "Create New Player", base_admin) }}</li>
         <li>{{ macros.link("/players", "View All Players", base_admin) }}</li>
     </ul>
+
+    <hr />
+
+    <h3>Player Challenge Tasks</h3>
+    <p>These tasks allow a Commissioner to modify a Player's Picks. Use with caution.</p>
+    <ul>
+        <li>{{ macros.link("/players/picks", "Edit a Player's Picks", base_admin) }}</li>
+    </ul>
+
+    <hr />
 
     <h3>Other Tasks</h3>
     <ul>
