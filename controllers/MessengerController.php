@@ -29,7 +29,30 @@ class MessengerController extends AppController
             );
         }
 
-        return ''; #self::getMessages();
+        // If a reply, send notification
+        if ($pid) {
+            if ($result = $db->qry('SELECT uid FROM {{messages}} WHERE mid = %s', $pid)) {
+                $obj = $result->fetch_object();
+
+                # Need to add opt-out feature
+                if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE uid = %s', $obj->uid)) {
+                    $obj = $result->fetch_object();
+
+                    if (isset($obj->username) && isset($obj->email)) {
+                        // We can send an email
+                        $site_name = option('site_name');
+                        $site_url  = sprintf('http://%s%s', $_SERVER['HTTP_HOST'], WODK_BASE_URI);
+                        $rn = "\r\n";
+
+                        $subject = 'Someone replied to your message';
+                        $message = "Another user replied to your message on {$site_name}.{$rn}{$rn}{$site_url}";
+                        self::notify($obj->username, $obj->email, $subject, $message);
+                    }
+                }
+            }
+        }
+
+        return '';
     }
 
     /* COMING SOON */

@@ -92,5 +92,42 @@ class AppController
     static function getEnv() {
         return (int) option('env');
     }
+
+    static function notify($name, $email, $subject, $message) {
+        $db  = option('db');
+        $log = option('log');
+
+        $rn   = "\r\n";
+        $env  = self::getEnv();
+        $base = sprintf('http://%s%s', $_SERVER['HTTP_HOST'], WODK_BASE_URI);
+        $acct = sprintf('%smy-account', $base);
+        $phpv = phpversion();
+        $appv = trim(option('app_version'));
+
+        $commissioners = array();
+
+        if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE permissions = 2')) {
+            while ($obj = $result->fetch_object()) {
+                $commissioners[] = "{$obj->username} <{$obj->email}>";
+            }
+
+            $commissioners = implode(', ', $commissioners);
+        }
+
+        $to = "$name <$email>";
+        $message = $message . "{$rn}{$rn}- - -{$rn}{$rn}To change your email settings, go to...{$rn}{$acct}{$rn}";
+        $headers = "From: {$commissioners}{$rn}Reply-To: {$commissioners}{$rn}X-Mailer: Football Challenge/{$appv} PHP/{$phpv}";
+
+        if ($env === ENV_PRODUCTION) {
+            $log->log('message', sprintf('Email sent: ', $subject));
+            mail($to, $subject, $message, $headers);
+        } elseif ($env === ENV_DEVELOPMENT) {
+            $log->log('message', htmlspecialchars("{$headers}{$rn}{$rn}To: {$to}{$rn}{$rn}{$subject}{$rn}{$rn}$message"));
+        } else {
+            $log->log('error', sprintf('Unmatched environment variable env(%s):%s', $env, gettype($env)));
+        }
+
+        return true;
+    }
 }
 ?>
