@@ -58,8 +58,10 @@ class UserController extends AppController
         $log = option('log');
         $user = option('user_info');
 
+        $query = 'SELECT email, reminder, notify FROM {{users}} WHERE uid = %s AND username = "%s" AND permissions = %s';
+
         if ($user['uid'] && $user['name'] && $user['perms']) {
-            if ($result = $db->qry('SELECT email, reminder, notify FROM {{users}} WHERE uid = %s AND username = "%s" AND permissions = %s', $db->escape_string($user['uid']), $db->escape_string($user['name']), $db->escape_string($user['perms']))) {
+            if ($result = $db->qry($query, $db->escape_string($user['uid']), $db->escape_string($user['name']), $db->escape_string($user['perms']))) {
                 if ($result->num_rows === 1) {
                     while ($obj = $result->fetch_object()) {
                         $user['email']    = $obj->email;
@@ -72,6 +74,9 @@ class UserController extends AppController
                     flash('error:finding account', 'There was problem finding your account.');
                     redirect_to('/logout');
                 }
+            }
+            else {
+                $log->log('error', 'Error getting additional user data.', $db->error);
             }
 
             return self::template('user/account.html.twig', array(

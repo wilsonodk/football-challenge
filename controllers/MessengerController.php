@@ -8,6 +8,7 @@ class MessengerController extends AppController
     static function create() {
         $db  = option('db');
         $log = option('log');
+
         // The ordemid, pid, uid, message (blob), posted, active, week (challenge week)
         $query     = 'INSERT INTO {{messages}} VALUES (NULL, %d, %s, "%s", %s, %s, %s)';
         $user_info = option('user_info');
@@ -15,13 +16,16 @@ class MessengerController extends AppController
         $pid = get_post('pid');
         $msg = get_post('message');
 
+        $poster = $user_info['uid'];
+        $replied_to = 0;
+
         if ($user_info['use'] === TRUE) {
             $pid = $pid === 'main' ? NULL : $pid;
             $msg = $db->escape_string(strip_tags($msg));
             $db->qry(
                 $query,
                 $pid,
-                $user_info['uid'],
+                $poster,
                 $msg,
                 time(),
                 1,
@@ -29,27 +33,54 @@ class MessengerController extends AppController
             );
         }
 
+        // These values are needed for emails
+        $site_name = option('site_name');
+        $site_url  = sprintf('http://%s%s', $_SERVER['HTTP_HOST'], WODK_BASE_URI);
+        $rn = "\r\n";
+
         // If a reply, send notification
         if ($pid) {
             if ($result = $db->qry('SELECT uid FROM {{messages}} WHERE mid = %s', $pid)) {
                 $obj = $result->fetch_object();
 
-                # Need to add opt-out feature
-                if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE uid = %s', $obj->uid)) {
-                    $obj = $result->fetch_object();
+                if ($poster !== $obj->uid) {
+                    if ($result = $db->qry('SELECT uid, username, email FROM {{users}} WHERE uid = %s AND notify = 1', $obj->uid)) {
+                        $obj = $result->fetch_object();
 
-                    if (isset($obj->username) && isset($obj->email)) {
-                        // We can send an email
-                        $site_name = option('site_name');
-                        $site_url  = sprintf('http://%s%s', $_SERVER['HTTP_HOST'], WODK_BASE_URI);
-                        $rn = "\r\n";
-
-                        $subject = 'Someone replied to your message';
-                        $message = "Another user replied to your message on {$site_name}.{$rn}{$rn}{$site_url}";
-                        self::notify($obj->username, $obj->email, $subject, $message);
+                        if (isset($obj->username) && isset($obj->email)) {
+                            $replied_to = $obj->uid;
+                            $subject = 'Someone replied to your message';
+                            $message = "Another user replied to your message on the {$site_name} site.{$rn}{$rn}{$site_url}";
+                            self::notify($obj->username, $obj->email, $subject, $message);
+                        }
                     }
                 }
             }
+        }
+
+        // Let's check the message body to see if it mentions another player
+        // Only checking for players that want notifications
+        $query = 'SELECT username, email FROM {{users}} WHERE notify = 1 AND uid != %s ORDER BY username';
+        $users = array();
+        if ($result = $db->qry($query, $replied_to)) {
+            while ($obj = $result->fetch_object()) {
+                $users[] = $obj;
+            }
+        }
+
+        $msg = strtolower($msg);
+        $matched = array();
+        foreach ($users as $user) {
+            if (strpos($msg, strtolower($user->username)) !== FALSE) {
+                $matched[$user->username] = $user;
+            }
+        }
+
+        foreach ($matched as $name => $user) {
+            // Email each user
+            $subject = 'Someone mentioned you';
+            $message = "Another user on the {$site_name} site mentioned you in a post.{$rn}{$rn}{$site_url}";
+            self::notify($name, $user->email, $subject, $message);
         }
 
         return '';

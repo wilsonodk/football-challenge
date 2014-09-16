@@ -104,6 +104,7 @@ class AppController
         $acct = sprintf('%smy-account', $base);
         $phpv = phpversion();
         $appv = trim(option('app_version'));
+        $site = option('site_name');
 
         $commissioners = array();
 
@@ -118,6 +119,7 @@ class AppController
         $to = "$name <$email>";
         $message = $message . "{$rn}{$rn}- - -{$rn}{$rn}To change your email settings, go to...{$rn}{$acct}{$rn}";
         $headers = "From: {$commissioners}{$rn}Reply-To: {$commissioners}{$rn}X-Mailer: Football Challenge/{$appv} PHP/{$phpv}";
+        $subject = "[{$site}]: {$subject}";
 
         if ($env === ENV_PRODUCTION) {
             $log->log('message', sprintf('Email sent: ', $subject));
