@@ -41,13 +41,13 @@ class AppController
     }
 
     static function getUserInfoFromName($name) {
-        $query = 'SELECT uid, username, email, permissions, password, reminder, submission FROM {{users}} WHERE username = "%s"';
+        $query = 'SELECT uid, username, email, permissions, password, reminder, notify, submission FROM {{users}} WHERE username = "%s"';
         $info = self::getUserInfo($query, $name);
         return $info;
     }
 
     static function getUserInfoFromUid($id) {
-        $query = 'SELECT uid, username, email, permissions, password, reminder, submission FROM {{users}} WHERE uid = %s';
+        $query = 'SELECT uid, username, email, permissions, password, reminder, notify, submission FROM {{users}} WHERE uid = %s';
         $info = self::getUserInfo($query, $id);
         return $info;
     }
@@ -66,6 +66,7 @@ class AppController
                 $usr['email']    = $obj->email;
                 $usr['password'] = $obj->password;
                 $usr['reminder'] = $obj->reminder;
+                $usr['notify']   = $obj->notify;
                 $usr['sub']      = $obj->submission;
             }
         } else {
