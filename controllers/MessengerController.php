@@ -86,33 +86,6 @@ class MessengerController extends AppController
         return '';
     }
 
-    /* COMING SOON */
-
-    static function edit($id) {
-        $db        = option('db');
-        $log       = option('log');
-        $query     = 'UPDATE {{messages}} SET message = "%s" WHERE mid = %s';
-        $user_info = option('user_info');
-        $username  = get_post('username');
-
-        if ($user_info['use'] && $user_info['name'] === $username) {
-            $mid = get_post('mid');
-            $msg = $db->escape_string(strip_tags(get_post('message')));
-
-            if (!$db->qry($query, $msg, $mid)) {
-                $log->log('error', "Attempt to update message $mid failed", $db->error);
-            }
-
-            return json_encode($GLOBALS['_PUT']);
-        }
-    }
-
-
-
-    static function delete($id) {
-        return 'Coming soon';
-    }
-
     /* Helpers */
 
     static function getMessages() {

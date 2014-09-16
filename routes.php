@@ -106,7 +106,5 @@ dispatch_put('/my-account', 'UserController::edit_account');
  */
 dispatch('/messages',      'MessengerController::show');
 dispatch_post('/messages', 'MessengerController::create');
-//dispatch_put('/messages/:id', 'MessengerController::edit');
-//dispatch_delete('/messages/:delete', 'MessengerController::delete');
 
 ?>
