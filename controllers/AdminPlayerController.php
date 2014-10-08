@@ -6,7 +6,7 @@ class AdminPlayerController extends AdminController
         if (self::checkPerms()) {
             $db = option('db');
             $players = array();
-            $query = 'SELECT uid, username AS name FROM {{users}} ORDER BY username';
+            $query = 'SELECT uid, username AS name, active FROM {{users}} ORDER BY username';
             if ($result = $db->qry($query)) {
                 while ($obj = $result->fetch_object()) {
                     $players[] = $obj;
@@ -52,8 +52,8 @@ class AdminPlayerController extends AdminController
         if (self::checkPerms()) {
             $db = option('db');
             $log = option('log');
-            // uid, username, email, password, wins, loses, permissions, submission, reminder
-            $query = 'INSERT INTO {{users}} VALUES (NULL, "%s", "%s", "%s", 0, 0, %s, 0, 1)';
+            // uid, username, email, password, wins, loses, permissions, submission, reminder, notify, active
+            $query = 'INSERT INTO {{users}} VALUES (NULL, "%s", "%s", "%s", 0, 0, %s, 0, 1, 1, 1)';
 
             if ($db->qry(
                     $query,
@@ -99,15 +99,17 @@ class AdminPlayerController extends AdminController
         if (self::checkPerms()) {
             $db = option('db');
             $log = option('log');
-            // uid, username, email, password, wins, loses, permissions, reminder
+            // uid, username, email, password, wins, loses, permissions, reminder, notify, active
             $db->setQuery(
                 'update',
-                'UPDATE {{users}} SET username = "%s", email = "%s", password = "%s", permissions = %s, reminder = %s WHERE uid = %s',
+                'UPDATE {{users}} SET username = "%s", email = "%s", password = "%s", permissions = %s, reminder = %s, notify = %s, active = %s WHERE uid = %s',
                 $db->escape_string(strtoupper(get_post('username'))),
                 $db->escape_string(strtolower(get_post('email'))),
                 self::password(get_post('username'), get_post('password')),
                 $db->escape_string(get_post('permissions')),
                 get_post('reminder') === 'yes' ? 1 : 0,
+                get_post('notify') === 'yes' ? 1 : 0,
+                get_post('active') === 'yes' ? 1 :0,
                 $id
             );
 

@@ -41,13 +41,13 @@ class AppController
     }
 
     static function getUserInfoFromName($name) {
-        $query = 'SELECT uid, username, email, permissions, password, reminder, submission FROM {{users}} WHERE username = "%s"';
+        $query = 'SELECT uid, username, email, permissions, password, reminder, notify, active, submission FROM {{users}} WHERE username = "%s"';
         $info = self::getUserInfo($query, $name);
         return $info;
     }
 
     static function getUserInfoFromUid($id) {
-        $query = 'SELECT uid, username, email, permissions, password, reminder, submission FROM {{users}} WHERE uid = %s';
+        $query = 'SELECT uid, username, email, permissions, password, reminder, notify, active, submission FROM {{users}} WHERE uid = %s';
         $info = self::getUserInfo($query, $id);
         return $info;
     }
@@ -66,6 +66,8 @@ class AppController
                 $usr['email']    = $obj->email;
                 $usr['password'] = $obj->password;
                 $usr['reminder'] = $obj->reminder;
+                $usr['notify']   = $obj->notify;
+                $usr['active']   = $obj->active;
                 $usr['sub']      = $obj->submission;
             }
         } else {
@@ -91,6 +93,45 @@ class AppController
 
     static function getEnv() {
         return (int) option('env');
+    }
+
+    static function notify($name, $email, $subject, $message) {
+        $db  = option('db');
+        $log = option('log');
+
+        $rn   = "\r\n";
+        $env  = self::getEnv();
+        $base = sprintf('http://%s%s', $_SERVER['HTTP_HOST'], WODK_BASE_URI);
+        $acct = sprintf('%smy-account', $base);
+        $phpv = phpversion();
+        $appv = trim(option('app_version'));
+        $site = option('site_name');
+
+        $commissioners = array();
+
+        if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE permissions = 2')) {
+            while ($obj = $result->fetch_object()) {
+                $commissioners[] = "{$obj->username} <{$obj->email}>";
+            }
+
+            $commissioners = implode(', ', $commissioners);
+        }
+
+        $to = "$name <$email>";
+        $message = $message . "{$rn}{$rn}- - -{$rn}{$rn}To change your email settings, go to...{$rn}{$acct}{$rn}";
+        $headers = "From: {$commissioners}{$rn}Reply-To: {$commissioners}{$rn}X-Mailer: Football Challenge/{$appv} PHP/{$phpv}";
+        $subject = "[{$site}]: {$subject}";
+
+        if ($env === ENV_PRODUCTION) {
+            $log->log('message', sprintf('Email sent: ', $subject));
+            mail($to, $subject, $message, $headers);
+        } elseif ($env === ENV_DEVELOPMENT) {
+            $log->log('message', htmlspecialchars("{$headers}{$rn}{$rn}To: {$to}{$rn}{$rn}{$subject}{$rn}{$rn}$message"));
+        } else {
+            $log->log('error', sprintf('Unmatched environment variable env(%s):%s', $env, gettype($env)));
+        }
+
+        return true;
     }
 }
 ?>

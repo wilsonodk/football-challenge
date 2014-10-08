@@ -62,7 +62,7 @@ class AdminController extends AppController
 
         $num_weeks = option('standings_week');
 
-        $get_users   = 'SELECT uid, username FROM {{users}}';
+        $get_users   = 'SELECT uid, username FROM {{users}} WHERE active = 1';
         $get_winners = 'SELECT cid, winner_sid FROM {{challenges}} WHERE year = %s AND week = %s';
         $get_subs    = 'SELECT subvalue FROM {{submissions}} WHERE subkey = "%s"';
         $set_users   = 'UPDATE {{users}} SET wins = %s, loses = %s, submission = 0 WHERE uid = %s';
@@ -217,57 +217,29 @@ class AdminController extends AppController
 
         $base = sprintf('http://%s%s', $_SERVER['HTTP_HOST'], WODK_BASE_URI);
         $url  = sprintf('%sweek/%s', $base, $week);
-        $acct = sprintf('%smy-account', $base);
-
-        $phpv = phpversion();
-        $appv = trim(option('app_version'));
-
-        $commissioners = array();
 
         $site_name = SITE_NAME;
 
         $env = self::getEnv();
 
-        // Get commissioners
-        if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE permissions = 2')) {
+        // Send the email to users without a submission, that want reminders and have an email
+        if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE active = 1 AND submission = 0 AND reminder = 1 AND email != ""')) {
             while ($obj = $result->fetch_object()) {
-                $commissioners[] = "{$obj->username} <{$obj->email}>";
-            }
+                $subject = "{$site_name} Reminder Week {$week}";
+                $message = "{$obj->username},{$rn}Time is running out to enter your picks!{$rn}{$rn}{$url}";
 
-            $commissioners = implode(', ', $commissioners);
-
-            // Send the email to users without a submission, that want reminders and have an email
-            if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE submission = 0 AND reminder = 1 AND email != ""')) {
-                while ($obj = $result->fetch_object()) {
-                    $to      = "{$obj->username} <{$obj->email}>";
-                    $subject = "{$site_name} Reminder Week {$week}";
-                    $message = "{$obj->username},{$rn}Time is running out to enter your picks!{$rn}{$rn}{$url}{$rn}{$rn}{$rn}{$rn}To change your email reminder settings, go to...{$rn}{$acct}{$rn}";
-                    $headers = "From: {$commissioners}{$rn}Reply-To: {$commissioners}{$rn}X-Mailer: Football Challenge/{$appv} PHP/{$phpv}";
-                    if ($env === ENV_PRODUCTION) {
-                        $log->log('message', sprintf('Reminder email sent to %s', htmlspecialchars($to)));
-                        mail($to, $subject, $message, $headers);
-                    }
-                    elseif ($env === ENV_DEVELOPMENT) {
-                        echo htmlspecialchars("{$headers}{$rn}{$rn}To: {$to}{$rn}{$rn}{$subject}{$rn}{$rn}$message{$rn}- - -{$rn}");
-                    }
-                    else {
-                        $log->log('error', sprintf('Unmatched environment variable env(%s):%s', $env, gettype($env)));
-                    }
-                }
-            }
-            else {
-                $log->log('error', 'Error getting all the users to email.', $db->error);
-            }
-
-            if ($env === ENV_PRODUCTION) {
-                // We've sent our reminder, let's update the challenge
-                if (! $db->qry('UPDATE {{challenges}} SET reminder_sent = 1 WHERE year = %s AND week = %s', FC_YEAR, $week)) {
-                    $log->log('error', 'Error updating the challenges.', $db->error);
-                }
+                self::notify($obj->username, $obj->email, $subject, $message);
             }
         }
         else {
-            $log->log('error', 'Error getting all the commissioners.', $db->error);
+            $log->log('error', 'Error getting all the users to email.', $db->error);
+        }
+
+        if ($env === ENV_PRODUCTION) {
+            // We've sent our reminder, let's update the challenge
+            if (! $db->qry('UPDATE {{challenges}} SET reminder_sent = 1 WHERE year = %s AND week = %s', FC_YEAR, $week)) {
+                $log->log('error', 'Error updating the challenges.', $db->error);
+            }
         }
     }
 }

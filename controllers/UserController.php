@@ -58,11 +58,14 @@ class UserController extends AppController
         $log = option('log');
         $user = option('user_info');
 
+        $query = 'SELECT email, reminder, notify FROM {{users}} WHERE uid = %s AND username = "%s" AND permissions = %s';
+
         if ($user['uid'] && $user['name'] && $user['perms']) {
-            if ($result = $db->qry('SELECT email, reminder FROM {{users}} WHERE uid = %s AND username = "%s" AND permissions = %s', $db->escape_string($user['uid']), $db->escape_string($user['name']), $db->escape_string($user['perms']))) {
+            if ($result = $db->qry($query, $db->escape_string($user['uid']), $db->escape_string($user['name']), $db->escape_string($user['perms']))) {
                 if ($result->num_rows === 1) {
                     while ($obj = $result->fetch_object()) {
                         $user['email']    = $obj->email;
+                        $user['notify']   = $obj->notify;
                         $user['reminder'] = $obj->reminder;
                     }
                 }
@@ -72,6 +75,9 @@ class UserController extends AppController
                     redirect_to('/logout');
                 }
             }
+            else {
+                $log->log('error', 'Error getting additional user data.', $db->error);
+            }
 
             return self::template('user/account.html.twig', array(
                 'page_name' => 'My Account',
@@ -80,6 +86,7 @@ class UserController extends AppController
                 'username'  => $user['name'],
                 'email'     => $user['email'],
                 'reminder'  => $user['reminder'],
+                'notify'    => $user['notify'],
             ));
         }
         else {
@@ -99,13 +106,16 @@ class UserController extends AppController
         $current_email    = get_post('current_email');
         $reminder         = get_post('reminder') === 'yes' ? 1 : 0;
         $current_reminder = (int) get_post('current_reminder');
+        $notify           = get_post('notify') === 'yes' ? 1 :0;
+        $current_notify   = (int) get_post('current_notify');
         $password         = array(
-            'old'   => self::password(get_post('username'), get_post('password')),
-            'new'   => self::password(get_post('username'), get_post('new-password')),
-            'again' => self::password(get_post('username'), get_post('new-password-again')),
+            'old'   => get_post('password') ? get_post('password') : FALSE,
+            'new'   => get_post('new-password') ? get_post('new-password') : FALSE,
+            'again' => get_post('new-password-again') ? get_post('new-password-again') : FALSE,
         );
         $pw_query         = FALSE;
         $email_query      = $email === $current_email ? FALSE : TRUE;
+        $notify_query     = $notify === $current_notify ? FALSE : TRUE;
         $reminder_query   = $reminder === $current_reminder ? FALSE : TRUE;
 
         $db->setQuery(
@@ -113,7 +123,7 @@ class UserController extends AppController
             'SELECT password FROM {{users}} WHERE uid = %s AND username = "%s" AND password = "%s"',
             $db->escape_string($uid),
             $db->escape_string($username),
-            $password['old']
+            self::password(get_post('username'), $password['old'])
         )
         ->setQuery(
             'email',
@@ -122,6 +132,13 @@ class UserController extends AppController
             $db->escape_string($uid),
             $db->escape_string($username),
             $db->escape_string($current_email)
+        )
+        ->setQuery(
+            'notify',
+            'UPDATE {{users}} SET notify = %s WHERE uid = %s AND username = "%s"',
+            $db->escape_string($notify),
+            $db->escape_string($uid),
+            $db->escape_string($username)
         )
         ->setQuery(
             'reminder',
@@ -133,6 +150,11 @@ class UserController extends AppController
 
         // Do we want to change our password?
         if ($password['old'] && $password['new'] && $password['again']) {
+            // They want a change, let's set them up
+            $password['old']   = self::password(get_post('username'), $password['old']);
+            $password['new']   = self::password(get_post('username'), $password['new']);
+            $password['again'] = self::password(get_post('username'), $password['again']);
+
             if ($result = $db->useQuery('validate')) {
                 if ($result->num_rows === 1) {
                     while ($obj = $result->fetch_object()) {
@@ -214,6 +236,25 @@ class UserController extends AppController
             else {
                 flash('error:update email generic', 'There was an error updating your email.');
                 $log->log('error', sprintf('Error with reminder query: %s', $db->getQuery('reminder')));
+                redirect_to('/');
+            }
+        }
+
+        if ($notify_query) {
+            if ($db->useQuery('notify')) {
+                if ($db->affected_rows === 1) {
+                    flash('message:notify updated', 'Your notification status has been updated.');
+                    $log->log('message', sprintf('User %s updated their notify status.', $username));
+                }
+                else {
+                    flash('error:update notify account', 'There was an issue with updating the notification status on your account.');
+                    $log->log('error', sprintf('Too many rows were updated on last query: %s', $db->getQuery('notify')));
+                    redirect_to('/');
+                }
+            }
+            else {
+                flash('error:update notify generic', 'There was an error updating your notification status.');
+                $log->log('error', sprintf('Error with notify query: %s', $db->getQuery('notify')));
                 redirect_to('/');
             }
         }

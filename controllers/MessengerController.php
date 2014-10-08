@@ -8,6 +8,7 @@ class MessengerController extends AppController
     static function create() {
         $db  = option('db');
         $log = option('log');
+
         // The ordemid, pid, uid, message (blob), posted, active, week (challenge week)
         $query     = 'INSERT INTO {{messages}} VALUES (NULL, %d, %s, "%s", %s, %s, %s)';
         $user_info = option('user_info');
@@ -15,13 +16,16 @@ class MessengerController extends AppController
         $pid = get_post('pid');
         $msg = get_post('message');
 
+        $poster = $user_info['uid'];
+        $replied_to = 0;
+
         if ($user_info['use'] === TRUE) {
             $pid = $pid === 'main' ? NULL : $pid;
             $msg = $db->escape_string(strip_tags($msg));
             $db->qry(
                 $query,
                 $pid,
-                $user_info['uid'],
+                $poster,
                 $msg,
                 time(),
                 1,
@@ -29,34 +33,57 @@ class MessengerController extends AppController
             );
         }
 
-        return ''; #self::getMessages();
-    }
+        // These values are needed for emails
+        $site_name = option('site_name');
+        $site_url  = sprintf('http://%s%s', $_SERVER['HTTP_HOST'], WODK_BASE_URI);
+        $rn = "\r\n";
 
-    /* COMING SOON */
+        // If a reply, send notification
+        if ($pid) {
+            if ($result = $db->qry('SELECT uid FROM {{messages}} WHERE mid = %s', $pid)) {
+                $obj = $result->fetch_object();
 
-    static function edit($id) {
-        $db        = option('db');
-        $log       = option('log');
-        $query     = 'UPDATE {{messages}} SET message = "%s" WHERE mid = %s';
-        $user_info = option('user_info');
-        $username  = get_post('username');
+                if ($poster !== $obj->uid) {
+                    if ($result = $db->qry('SELECT uid, username, email FROM {{users}} WHERE active = 1 AND uid = %s AND notify = 1', $obj->uid)) {
+                        $obj = $result->fetch_object();
 
-        if ($user_info['use'] && $user_info['name'] === $username) {
-            $mid = get_post('mid');
-            $msg = $db->escape_string(strip_tags(get_post('message')));
-
-            if (!$db->qry($query, $msg, $mid)) {
-                $log->log('error', "Attempt to update message $mid failed", $db->error);
+                        if (isset($obj->username) && isset($obj->email)) {
+                            $replied_to = $obj->uid;
+                            $subject = 'Someone replied to your message';
+                            $message = "Another user replied to your message on the {$site_name} site.{$rn}{$rn}{$site_url}";
+                            self::notify($obj->username, $obj->email, $subject, $message);
+                        }
+                    }
+                }
             }
-
-            return json_encode($GLOBALS['_PUT']);
         }
-    }
 
+        // Let's check the message body to see if it mentions another player
+        // Only checking for players that want notifications
+        $query = 'SELECT username, email FROM {{users}} WHERE active = 1 AND notify = 1 AND uid != %s ORDER BY username';
+        $users = array();
+        if ($result = $db->qry($query, $replied_to)) {
+            while ($obj = $result->fetch_object()) {
+                $users[] = $obj;
+            }
+        }
 
+        $msg = strtolower($msg);
+        $matched = array();
+        foreach ($users as $user) {
+            if (strpos($msg, strtolower($user->username)) !== FALSE) {
+                $matched[$user->username] = $user;
+            }
+        }
 
-    static function delete($id) {
-        return 'Coming soon';
+        foreach ($matched as $name => $user) {
+            // Email each user
+            $subject = 'Someone mentioned you';
+            $message = "Another user on the {$site_name} site mentioned you in a post.{$rn}{$rn}{$site_url}";
+            self::notify($name, $user->email, $subject, $message);
+        }
+
+        return '';
     }
 
     /* Helpers */

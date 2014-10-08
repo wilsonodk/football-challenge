@@ -469,6 +469,9 @@ table td.padded {
     display: inline-block;
     width: 150px;
 }
+#player-admin li .name.inactive {
+    color: #999;
+}
 #player-admin li:hover {
     background-color: #ddd;
 }
@@ -480,6 +483,7 @@ table td.padded {
 #player-admin li .actions a {
     font-weight: normal;
 }
+
 .delete {
     padding: 3px 5px;
     border: 1px solid #fff;
@@ -494,4 +498,11 @@ hr {
     background-image:    -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
     background-image:     -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
     background-image:      -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+}
+.player_active {
+    color: #090;
+}
+.player_inactive: {
+    color: #900;
+    font-weight: bold;
 }
