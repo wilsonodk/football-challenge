@@ -8,7 +8,7 @@ class AdminPlayerPicksController extends AdminController
             $log = option('log');
 
             $players = array();
-            $query = 'SELECT uid, username FROM {{users}} ORDER BY username';
+            $query = 'SELECT uid, username FROM {{users}} WHERE active = 1 ORDER BY username';
 
             if ($result = $db->qry($query)) {
                 while ($obj = $result->fetch_object()) {

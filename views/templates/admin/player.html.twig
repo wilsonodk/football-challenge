@@ -3,6 +3,7 @@
 {% block content %}
     {{ parent() }}
     {% set method %}{% if activity == 'Create' %}POST{% elseif activity == 'Edit' %}PUT{% elseif activity == 'Delete' %}DELETE{% else %}VIEW{% endif %}{% endset %}
+    {% set player_active %}{% if player.active == 1 %}active{% else %}inactive{% endif %}{% endset %}
 
     <h2>{{ activity }} Player</h2>
 
@@ -12,7 +13,16 @@
     {% endif %}
 
     <h3>Username</h3>
-    <p>{% if activity == 'Create' or activity == 'Edit' %}<input type="text" name="username" value="{{ player.name }}" />{% else %}{{ player.name }}{% endif %}</p>
+    <p>
+        {% if activity == 'Create' or activity == 'Edit' %}
+            <input type="text" name="username" value="{{ player.name }}" />
+            {% if activity == 'Edit' %}
+                </p><p><input type="checkbox" name="active"{% if player.active %} checked="checked"{% endif %} /> Active player
+            {% endif %}
+        {% else %}
+            {{ player.name }} <span class="player_{{ player_active }}">{{ player_active }}</span>
+        {% endif %}
+    </p>
 
     <h3>Email</h3>
     <p>{% if activity == 'Create' or activity == 'Edit' %}<input type="text" name="email" value="{{ player.email }}" />{% else %}{{ player.email }}{% endif %}</p>

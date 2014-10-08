@@ -62,7 +62,7 @@ class AdminController extends AppController
 
         $num_weeks = option('standings_week');
 
-        $get_users   = 'SELECT uid, username FROM {{users}}';
+        $get_users   = 'SELECT uid, username FROM {{users}} WHERE active = 1';
         $get_winners = 'SELECT cid, winner_sid FROM {{challenges}} WHERE year = %s AND week = %s';
         $get_subs    = 'SELECT subvalue FROM {{submissions}} WHERE subkey = "%s"';
         $set_users   = 'UPDATE {{users}} SET wins = %s, loses = %s, submission = 0 WHERE uid = %s';
@@ -223,7 +223,7 @@ class AdminController extends AppController
         $env = self::getEnv();
 
         // Send the email to users without a submission, that want reminders and have an email
-        if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE submission = 0 AND reminder = 1 AND email != ""')) {
+        if ($result = $db->qry('SELECT username, email FROM {{users}} WHERE active = 1 AND submission = 0 AND reminder = 1 AND email != ""')) {
             while ($obj = $result->fetch_object()) {
                 $subject = "{$site_name} Reminder Week {$week}";
                 $message = "{$obj->username},{$rn}Time is running out to enter your picks!{$rn}{$rn}{$url}";

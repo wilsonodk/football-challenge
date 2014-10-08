@@ -283,7 +283,7 @@ class MainController extends AppController
             ));
         }
         else {
-            if ($result = $db->qry('SELECT username AS name FROM {{users}} ORDER BY username')) {
+            if ($result = $db->qry('SELECT username AS name FROM {{users}} WHERE active = 1 ORDER BY username')) {
                 $users = array();
 
                 while ($obj = $result->fetch_object()) {
@@ -333,7 +333,7 @@ class MainController extends AppController
 
                 // Get all the user submissions for this week
                 $submissions = array();
-                if ($results = $db->qry('SELECT subvalue FROM {{submissions}} WHERE year = %s AND week = %s ORDER BY subkey', $year, $week)) {
+                if ($results = $db->qry('SELECT s.subvalue FROM {{submissions}} s, {{users}} u WHERE u.active = 1 AND u.uid = s.uid AND year = %s AND week = %s ORDER BY subkey', $year, $week)) {
                     while ($obj = $results->fetch_object()) {
                         $submissions[] = unserialize($obj->subvalue);
                     }
@@ -377,7 +377,7 @@ class MainController extends AppController
 
             // Get all the users and their challenge
             $output['users'] = array();
-            $users_sub_query = 'SELECT {{users}}.username, {{submissions}}.subvalue FROM {{users}} LEFT JOIN {{submissions}} ON {{users}}.uid = {{submissions}}.uid WHERE {{submissions}}.year = %s AND {{submissions}}.week = %s';
+            $users_sub_query = 'SELECT u.username, s.subvalue FROM {{users}} u LEFT JOIN {{submissions}} s ON u.uid = s.uid WHERE u.active = 1 AND s.year = %s AND s.week = %s';
             if ($result = $db->qry($users_sub_query, FC_YEAR, $week)) {
                 while ($obj = $result->fetch_object()) {
                     $output['users'][] = $obj;
@@ -465,7 +465,7 @@ class MainController extends AppController
         $year  = FC_YEAR;
         $arr   = array();
 
-        if ($results = $db->qry('SELECT username, wins, loses, submission FROM {{users}} ORDER BY wins DESC, loses DESC, username')) {
+        if ($results = $db->qry('SELECT username, wins, loses, submission FROM {{users}} WHERE active = 1 ORDER BY wins DESC, loses DESC, username')) {
             while ($obj = $results->fetch_object()) {
                 $temp = new StdClass();
                 $temp->name  = $obj->username;
