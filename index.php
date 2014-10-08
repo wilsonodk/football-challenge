@@ -1,4 +1,5 @@
 <?php
+
 // Since we do lots of date/time stuff, set default timezone
 date_default_timezone_set('America/New_York');
 // Setup constants
@@ -9,7 +10,7 @@ define('TEMPLATE_DIR',  SITE_ROOT . '/views/templates');
 define('SITE_NAME',     'Junkies');
 define('WODK_LOG',      SITE_ROOT . '/web_app.log');
 define('WODK_BASE_URI', '/junkies/');
-define('FORBIDDEN',     403); // Use this with halt() to send a 403 Forbidden
+define('FORBIDDEN',     403);
 
 // Football Challenge constants
 define('FC_LOG',            SITE_ROOT . '/football-challenge.log');
@@ -29,25 +30,23 @@ define('FC_MSGS_TRUNCATE', 1);
 // Get the Wodk Library (DB, Logger and TwigExtensions)
 // Get our templating engine Twig
 // Get the micro-framework Limonade
-require_once('vendor/autoload.php');
+require_once 'vendor/autoload.php';
 
 // Autoload our controllers
-require_once('controllers/AppController.php');
+require_once 'controllers/AppController.php';
 AppController::register();
 
 // Get our routes
-require_once('routes.php');
+require_once 'routes.php';
 
 // Global helpers
 function get_post($var) {
     if (isset($_POST[$var])) {
         return $_POST[$var];
-    }
-    elseif (isset($GLOBALS['_JSON']->$var)) {
+    } else if (isset($GLOBALS['_JSON']->$var)) {
         return $GLOBALS['_JSON']->$var;
-    }
-    else {
-        $json = json_decode(file_get_contents("php://input"));
+    } else {
+        $json = json_decode(file_get_contents('php://input'));
 
         if (isset($json)) {
             if (isset($json->$var)) {
@@ -66,8 +65,7 @@ function get_flash_messages($all) {
     foreach ($all as $type => $msg) {
         if (strpos($type, 'error') !== FALSE) {
             array_push($errs, $msg);
-        }
-        elseif (strpos($type, 'message') !== FALSE) {
+        } else if (strpos($type, 'message') !== FALSE) {
             array_push($msgs, $msg);
         }
     }
@@ -111,9 +109,9 @@ function configure() {
     $twig->addExtension(new Wodk_TwigExtensions());
     option('twig', $twig);
 
-    //
-    // Setup other application configurations
-    //
+    /*
+     * Setup other application configurations
+     */
 
     // Challenge Weeks
     $challenge_weeks = array();
@@ -171,8 +169,7 @@ function configure() {
         while ($user = $users->fetch_object()) {
             $all_users[] = $user;
         }
-    }
-    else {
+    } else {
         $log->log('error', 'Trying to select users while in configure()', $db->error);
     }
     option('all_users', $all_users);
@@ -192,7 +189,7 @@ function before() {
     // Footer
     $db = option('db');
     $footer = array();
-    if ($result = $db->qry('SELECT username FROM {{users}} ORDER BY username')) {
+    if ($result = $db->qry('SELECT username FROM {{users}} WHERE active = 1 ORDER BY username')) {
         while ($obj = $result->fetch_object()) {
             $footer[] = array(
                 'name' => $obj->username,
@@ -210,5 +207,3 @@ function before_exit($exit) {
 
 // Start app
 run();
-
-?>

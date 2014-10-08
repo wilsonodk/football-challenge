@@ -44,7 +44,7 @@ class MessengerController extends AppController
                 $obj = $result->fetch_object();
 
                 if ($poster !== $obj->uid) {
-                    if ($result = $db->qry('SELECT uid, username, email FROM {{users}} WHERE uid = %s AND notify = 1', $obj->uid)) {
+                    if ($result = $db->qry('SELECT uid, username, email FROM {{users}} WHERE active = 1 AND uid = %s AND notify = 1', $obj->uid)) {
                         $obj = $result->fetch_object();
 
                         if (isset($obj->username) && isset($obj->email)) {
@@ -60,7 +60,7 @@ class MessengerController extends AppController
 
         // Let's check the message body to see if it mentions another player
         // Only checking for players that want notifications
-        $query = 'SELECT username, email FROM {{users}} WHERE notify = 1 AND uid != %s ORDER BY username';
+        $query = 'SELECT username, email FROM {{users}} WHERE active = 1 AND notify = 1 AND uid != %s ORDER BY username';
         $users = array();
         if ($result = $db->qry($query, $replied_to)) {
             while ($obj = $result->fetch_object()) {
