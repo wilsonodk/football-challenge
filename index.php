@@ -14,9 +14,10 @@ define('FORBIDDEN',     403);
 
 // Football Challenge constants
 define('FC_LOG',            SITE_ROOT . '/football-challenge.log');
-define('FC_COOKIE',         'football-challenge');
 define('FC_YEAR',           2014);
+define('FC_COOKIE',         'football-challenge');
 define('FC_NUM_WEEKS',      15);
+define('FC_TAB_LIMIT',      12);
 define('FC_DEFAULT_VALUE',  9999);
 define('FC_NUM_CHALLENGES', 10);
 
@@ -127,6 +128,13 @@ function configure() {
     $challenge_weeks_len = count($challenge_weeks);
     if ($challenge_weeks_len > 0) {
         $challenge_weeks[$challenge_weeks_len - 1]['path'] = '/week/' . $challenge_weeks[$challenge_weeks_len - 1]['num'];
+    }
+
+    // We have an upper limit of tabs we can show
+    if ($challenge_weeks_len > FC_TAB_LIMIT) {
+        while (count($challenge_weeks) > FC_TAB_LIMIT) {
+            array_shift($challenge_weeks);
+        }
     }
     option('challenge_weeks', $challenge_weeks);
 
